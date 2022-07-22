@@ -120,7 +120,7 @@ After updating the **context** section, you will need to run again `npx projen` 
 ```
 
 > We recommend using `useFSX: 'yes'`, `ec2Cluster: 'yes'` for better performqnces on the shared filesystem
-> **WANING** You need to configure `route53_domain_zone: 'your-hosted-zone.route53.com'` because our magento setup don't work without https
+> **WARNING** You need to configure `route53_domain_zone: 'your-hosted-zone.route53.com'` because our magento setup don't work without https
 
 You can find more details of available configuration parameters [here](doc/configuration.md)
 
