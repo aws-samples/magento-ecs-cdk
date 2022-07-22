@@ -1,0 +1,9 @@
+FROM public.ecr.aws/seb-demo/magento:5.0.2
+LABEL maintainer "Sébastien Allamand"
+
+USER root
+RUN rm -f /opt/bitnami/apache/var/run/httpd.pid
+
+COPY entrypoint.sh /opt/bitnami/scripts/magento/
+
+USER daemon

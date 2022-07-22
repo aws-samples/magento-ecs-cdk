@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  MagentoFsId:
+    Type: String
+    Default: 'something'
+    Description: FSxN file system Id
+
+Resources:
+  magentoSVM:
+    Type: AWS::FSx::StorageVirtualMachine
+    Properties:
+      FileSystemId: !Ref MagentoFsId
+      Name: 'magento'
+      RootVolumeSecurityStyle: 'MIXED'
+
+  datavol:
+    Type: AWS::FSx::Volume
+    Properties:
+      Name: 'datavol'
+      OntapConfiguration:
+        JunctionPath: '/datavol'
+        SecurityStyle: 'MIXED'
+        SizeInMegabytes: 102400
+        StorageVirtualMachineId: !Ref magentoSVM
+        StorageEfficiencyEnabled: True
+      VolumeType: 'ONTAP'

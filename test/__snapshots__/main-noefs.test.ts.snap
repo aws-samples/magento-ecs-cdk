@@ -1,0 +1,2484 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Magento Stack with No Admin, No EFS Check Snapshot 1`] = `
+Object {
+  "Outputs": Object {
+    "ClusterName": Object {
+      "Value": Object {
+        "Ref": "ClusterEB0386A7",
+      },
+    },
+    "EcsExecBucketOut": Object {
+      "Value": Object {
+        "Ref": "EcsExecBucket4F468651",
+      },
+    },
+    "EcsExecCommandMagentoService": Object {
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "ecs_exec_service ",
+            Object {
+              "Ref": "ClusterEB0386A7",
+            },
+            " ",
+            Object {
+              "Fn::GetAtt": Array [
+                "MagentoServiceServiceMagentoService0563DA5B",
+                "Name",
+              ],
+            },
+            " magento",
+          ],
+        ],
+      },
+    },
+    "EcsExecLogGroupOut": Object {
+      "Value": Object {
+        "Ref": "ECSExecLogGroup95B1C6C8",
+      },
+    },
+    "EcsKMSAlias": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ECSKmsKey6C68CB5D",
+          "Arn",
+        ],
+      },
+    },
+    "EsDomainEndpoint": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "Domain66AC69E0",
+          "DomainEndpoint",
+        ],
+      },
+    },
+    "EsDomainName": Object {
+      "Value": Object {
+        "Ref": "Domain66AC69E0",
+      },
+    },
+    "EsMasterUserPassword": Object {
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "{{resolve:secretsmanager:",
+            Object {
+              "Ref": "opensearchAdminPasswordF9AAABC9",
+            },
+            ":SecretString:::}}",
+          ],
+        ],
+      },
+    },
+    "MagentoAdminPasswordOutput": Object {
+      "Value": "magento/magentoAdminPassword",
+    },
+    "MagentoDatabasePasswordOutput": Object {
+      "Value": "magento/MagentoDatabasePassword",
+    },
+    "MagentoOpensearchAdminPasswordOutput": Object {
+      "Value": "magento/opensearchAdminPassword",
+    },
+    "MagentoServiceMagentoServiceURL535A3D99": Object {
+      "Value": "https://magento.magento.mydomain.com",
+    },
+    "MagentoServicemagentoURL8C570F66": Object {
+      "Value": "https://magento.magento.mydomain.com",
+    },
+  },
+  "Parameters": Object {
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+    "MagentoServiceCertArnParameterParameterAD41925C": Object {
+      "Default": "CertificateArn-magento.mydomain.com",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": Object {
+    "AWS679f53fac002430cb0da5b7982bd22872D164C4C": Object {
+      "DependsOn": Array [
+        "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
+          "S3Key": "6dbd112fe448437b3438da4382c72fccbb7d2ee1543db222620d7447fffebc50.zip",
+        },
+        "Handler": "index.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 120,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "Cluster3DA9CCBA": Object {
+      "Properties": Object {
+        "CapacityProviders": Array [
+          "FARGATE",
+          "FARGATE_SPOT",
+        ],
+        "Cluster": Object {
+          "Ref": "ClusterEB0386A7",
+        },
+        "DefaultCapacityProviderStrategy": Array [],
+      },
+      "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+    },
+    "ClusterEB0386A7": Object {
+      "Properties": Object {
+        "ClusterName": "magento",
+        "ClusterSettings": Array [
+          Object {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+        "Configuration": Object {
+          "ExecuteCommandConfiguration": Object {
+            "KmsKeyId": Object {
+              "Fn::GetAtt": Array [
+                "ECSKmsKey6C68CB5D",
+                "Arn",
+              ],
+            },
+            "LogConfiguration": Object {
+              "CloudWatchEncryptionEnabled": true,
+              "CloudWatchLogGroupName": Object {
+                "Ref": "ECSExecLogGroup95B1C6C8",
+              },
+              "S3BucketName": Object {
+                "Ref": "EcsExecBucket4F468651",
+              },
+              "S3EncryptionEnabled": true,
+              "S3KeyPrefix": "exec-command-output",
+            },
+            "Logging": "OVERRIDE",
+          },
+        },
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": Object {
+      "DependsOn": Array [
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
+          "S3Key": "e57c1acaa363d7d2b81736776007a7091bc73dff4aeb8135627c4511a51e7dca.zip",
+        },
+        "Description": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "Lambda function for auto-deleting objects in ",
+              Object {
+                "Ref": "EcsExecBucket4F468651",
+              },
+              " S3 bucket.",
+            ],
+          ],
+        },
+        "Handler": "__entrypoint__.handler",
+        "MemorySize": 128,
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "Domain66AC69E0": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376CustomResourcePolicy3E9378CD",
+        "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca37623A944F0",
+      ],
+      "Properties": Object {
+        "AdvancedSecurityOptions": Object {
+          "Enabled": true,
+          "InternalUserDatabaseEnabled": true,
+          "MasterUserOptions": Object {
+            "MasterUserName": "magento-os-master",
+            "MasterUserPassword": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "{{resolve:secretsmanager:",
+                  Object {
+                    "Ref": "opensearchAdminPasswordF9AAABC9",
+                  },
+                  ":SecretString:::}}",
+                ],
+              ],
+            },
+          },
+        },
+        "ClusterConfig": Object {
+          "DedicatedMasterEnabled": false,
+          "InstanceCount": 1,
+          "InstanceType": "r5.large.search",
+          "ZoneAwarenessEnabled": false,
+        },
+        "CognitoOptions": Object {
+          "Enabled": false,
+        },
+        "DomainEndpointOptions": Object {
+          "EnforceHTTPS": true,
+          "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+        },
+        "DomainName": "magento",
+        "EBSOptions": Object {
+          "EBSEnabled": true,
+          "VolumeSize": 20,
+          "VolumeType": "gp2",
+        },
+        "EncryptionAtRestOptions": Object {
+          "Enabled": true,
+        },
+        "EngineVersion": "OpenSearch_1.0",
+        "LogPublishingOptions": Object {
+          "ES_APPLICATION_LOGS": Object {
+            "CloudWatchLogsLogGroupArn": Object {
+              "Fn::GetAtt": Array [
+                "DomainAppLogs21698C1B",
+                "Arn",
+              ],
+            },
+            "Enabled": true,
+          },
+          "INDEX_SLOW_LOGS": Object {
+            "CloudWatchLogsLogGroupArn": Object {
+              "Fn::GetAtt": Array [
+                "DomainSlowIndexLogsFE2F1061",
+                "Arn",
+              ],
+            },
+            "Enabled": true,
+          },
+          "SEARCH_SLOW_LOGS": Object {
+            "CloudWatchLogsLogGroupArn": Object {
+              "Fn::GetAtt": Array [
+                "DomainSlowSearchLogs5B35A97A",
+                "Arn",
+              ],
+            },
+            "Enabled": true,
+          },
+        },
+        "NodeToNodeEncryptionOptions": Object {
+          "Enabled": true,
+        },
+      },
+      "Type": "AWS::OpenSearchService::Domain",
+      "UpdatePolicy": Object {
+        "EnableVersionUpgrade": true,
+      },
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DomainAccessPolicyCustomResourcePolicyE61F1845": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "es:UpdateDomainConfig",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "Domain66AC69E0",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "DomainAccessPolicyCustomResourcePolicyE61F1845",
+        "Roles": Array [
+          Object {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "DomainAccessPolicyEE735B04": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "DomainAccessPolicyCustomResourcePolicyE61F1845",
+      ],
+      "Properties": Object {
+        "Create": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"action\\":\\"updateDomainConfig\\",\\"service\\":\\"OpenSearch\\",\\"parameters\\":{\\"DomainName\\":\\"",
+              Object {
+                "Ref": "Domain66AC69E0",
+              },
+              "\\",\\"AccessPolicies\\":\\"{\\\\\\"Statement\\\\\\":[{\\\\\\"Action\\\\\\":\\\\\\"es:ESHttp*\\\\\\",\\\\\\"Effect\\\\\\":\\\\\\"Allow\\\\\\",\\\\\\"Principal\\\\\\":{\\\\\\"AWS\\\\\\":\\\\\\"*\\\\\\"},\\\\\\"Resource\\\\\\":\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "Domain66AC69E0",
+                  "Arn",
+                ],
+              },
+              "/*\\\\\\"}],\\\\\\"Version\\\\\\":\\\\\\"2012-10-17\\\\\\"}\\"},\\"outputPaths\\":[\\"DomainConfig.AccessPolicies\\"],\\"physicalResourceId\\":{\\"id\\":\\"",
+              Object {
+                "Ref": "Domain66AC69E0",
+              },
+              "AccessPolicy\\"}}",
+            ],
+          ],
+        },
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+        "Update": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"action\\":\\"updateDomainConfig\\",\\"service\\":\\"OpenSearch\\",\\"parameters\\":{\\"DomainName\\":\\"",
+              Object {
+                "Ref": "Domain66AC69E0",
+              },
+              "\\",\\"AccessPolicies\\":\\"{\\\\\\"Statement\\\\\\":[{\\\\\\"Action\\\\\\":\\\\\\"es:ESHttp*\\\\\\",\\\\\\"Effect\\\\\\":\\\\\\"Allow\\\\\\",\\\\\\"Principal\\\\\\":{\\\\\\"AWS\\\\\\":\\\\\\"*\\\\\\"},\\\\\\"Resource\\\\\\":\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "Domain66AC69E0",
+                  "Arn",
+                ],
+              },
+              "/*\\\\\\"}],\\\\\\"Version\\\\\\":\\\\\\"2012-10-17\\\\\\"}\\"},\\"outputPaths\\":[\\"DomainConfig.AccessPolicies\\"],\\"physicalResourceId\\":{\\"id\\":\\"",
+              Object {
+                "Ref": "Domain66AC69E0",
+              },
+              "AccessPolicy\\"}}",
+            ],
+          ],
+        },
+      },
+      "Type": "Custom::OpenSearchAccessPolicy",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DomainAppLogs21698C1B": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca37623A944F0": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376CustomResourcePolicy3E9378CD",
+      ],
+      "Properties": Object {
+        "Create": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"service\\":\\"CloudWatchLogs\\",\\"action\\":\\"putResourcePolicy\\",\\"parameters\\":{\\"policyName\\":\\"ESLogPolicyc84126e83aed825c440510351cb06dac09eabca376\\",\\"policyDocument\\":\\"{\\\\\\"Statement\\\\\\":[{\\\\\\"Action\\\\\\":[\\\\\\"logs:PutLogEvents\\\\\\",\\\\\\"logs:CreateLogStream\\\\\\"],\\\\\\"Effect\\\\\\":\\\\\\"Allow\\\\\\",\\\\\\"Principal\\\\\\":{\\\\\\"Service\\\\\\":\\\\\\"es.amazonaws.com\\\\\\"},\\\\\\"Resource\\\\\\":[\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainSlowSearchLogs5B35A97A",
+                  "Arn",
+                ],
+              },
+              "\\\\\\",\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainSlowIndexLogsFE2F1061",
+                  "Arn",
+                ],
+              },
+              "\\\\\\",\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainAppLogs21698C1B",
+                  "Arn",
+                ],
+              },
+              "\\\\\\"]}],\\\\\\"Version\\\\\\":\\\\\\"2012-10-17\\\\\\"}\\"},\\"physicalResourceId\\":{\\"id\\":\\"ESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376\\"}}",
+            ],
+          ],
+        },
+        "Delete": "{\\"service\\":\\"CloudWatchLogs\\",\\"action\\":\\"deleteResourcePolicy\\",\\"parameters\\":{\\"policyName\\":\\"ESLogPolicyc84126e83aed825c440510351cb06dac09eabca376\\"},\\"ignoreErrorCodesMatching\\":\\"400\\"}",
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+        "Update": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"service\\":\\"CloudWatchLogs\\",\\"action\\":\\"putResourcePolicy\\",\\"parameters\\":{\\"policyName\\":\\"ESLogPolicyc84126e83aed825c440510351cb06dac09eabca376\\",\\"policyDocument\\":\\"{\\\\\\"Statement\\\\\\":[{\\\\\\"Action\\\\\\":[\\\\\\"logs:PutLogEvents\\\\\\",\\\\\\"logs:CreateLogStream\\\\\\"],\\\\\\"Effect\\\\\\":\\\\\\"Allow\\\\\\",\\\\\\"Principal\\\\\\":{\\\\\\"Service\\\\\\":\\\\\\"es.amazonaws.com\\\\\\"},\\\\\\"Resource\\\\\\":[\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainSlowSearchLogs5B35A97A",
+                  "Arn",
+                ],
+              },
+              "\\\\\\",\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainSlowIndexLogsFE2F1061",
+                  "Arn",
+                ],
+              },
+              "\\\\\\",\\\\\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DomainAppLogs21698C1B",
+                  "Arn",
+                ],
+              },
+              "\\\\\\"]}],\\\\\\"Version\\\\\\":\\\\\\"2012-10-17\\\\\\"}\\"},\\"physicalResourceId\\":{\\"id\\":\\"ESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376\\"}}",
+            ],
+          ],
+        },
+      },
+      "Type": "Custom::CloudwatchLogResourcePolicy",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376CustomResourcePolicy3E9378CD": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "logs:PutResourcePolicy",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": "logs:DeleteResourcePolicy",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "DomainESLogGroupPolicyc84126e83aed825c440510351cb06dac09eabca376CustomResourcePolicy3E9378CD",
+        "Roles": Array [
+          Object {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "DomainSlowIndexLogsFE2F1061": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "DomainSlowSearchLogs5B35A97A": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ECSExecLogGroup95B1C6C8": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ECSKmsKey6C68CB5D",
+            "Arn",
+          ],
+        },
+        "LogGroupName": "/ecs/secu/exec/magento",
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ECSKmsKey6C68CB5D": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "KeyPolicy": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::1234567890:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+              ],
+              "Condition": Object {
+                "StringEquals": Object {
+                  "kms:ViaService": "secretsmanager.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::1234567890:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "kms:CreateGrant",
+                "kms:DescribeKey",
+              ],
+              "Condition": Object {
+                "StringEquals": Object {
+                  "kms:ViaService": "secretsmanager.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::1234567890:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+            Object {
+              "Action": "kms:Decrypt",
+              "Condition": Object {
+                "StringEquals": Object {
+                  "kms:ViaService": "secretsmanager.us-east-1.amazonaws.com",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::GetAtt": Array [
+                    "MagentoServiceTaskDefMagentoServiceExecutionRoleD8E8A4AF",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "kms:Encrypt*",
+                "kms:Decrypt*",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:Describe*",
+              ],
+              "Condition": Object {
+                "ArnLike": Object {
+                  "kms:EncryptionContext:aws:logs:arn": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:us-east-1:1234567890:*",
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "logs.us-east-1.amazonaws.com",
+              },
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ECSKmsKeyAlias8197D854": Object {
+      "Properties": Object {
+        "AliasName": "alias/magento-kms-ecs-magento",
+        "TargetKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ECSKmsKey6C68CB5D",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "EcsExecBucket4F468651": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "BucketEncryption": Object {
+          "ServerSideEncryptionConfiguration": Array [
+            Object {
+              "ServerSideEncryptionByDefault": Object {
+                "KMSMasterKeyID": Object {
+                  "Fn::GetAtt": Array [
+                    "ECSKmsKey6C68CB5D",
+                    "Arn",
+                  ],
+                },
+                "SSEAlgorithm": "aws:kms",
+              },
+            },
+          ],
+        },
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "EcsExecBucketAutoDeleteObjectsCustomResourceAEE7BAD7": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "EcsExecBucketPolicy11059FA6",
+      ],
+      "Properties": Object {
+        "BucketName": Object {
+          "Ref": "EcsExecBucket4F468651",
+        },
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "EcsExecBucketPolicy11059FA6": Object {
+      "Properties": Object {
+        "Bucket": Object {
+          "Ref": "EcsExecBucket4F468651",
+        },
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::GetAtt": Array [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "EcsExecBucket4F468651",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "EcsExecBucket4F468651",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "EfsFileSystemSecurityGroupE6F815B1": Object {
+      "Properties": Object {
+        "GroupDescription": "magento/EfsFileSystemSecurityGroup",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "EfsFileSystemSecurityGroupfrommagentoserviceSecurityGroup6811311620499D6688FE": Object {
+      "Properties": Object {
+        "Description": "from magentoserviceSecurityGroup68113116:2049",
+        "FromPort": 2049,
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "EfsFileSystemSecurityGroupE6F815B1",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+        "ToPort": 2049,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "ElasticacheSecurityGroup5E2118FC": Object {
+      "Properties": Object {
+        "GroupDescription": "Allow Redis port from ECS",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "ElasticacheSecurityGroupfrommagentoserviceSecurityGroup6811311663798649101A": Object {
+      "Properties": Object {
+        "Description": "from magentoserviceSecurityGroup68113116:6379",
+        "FromPort": 6379,
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "ElasticacheSecurityGroup5E2118FC",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+        "ToPort": 6379,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "MagentoAuroraCluster576B8023": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "CopyTagsToSnapshot": true,
+        "DBClusterParameterGroupName": "default.aurora-mysql5.7",
+        "DBSubnetGroupName": Object {
+          "Ref": "MagentoAuroraClusterSubnets1D05994E",
+        },
+        "DatabaseName": "magento",
+        "Engine": "aurora-mysql",
+        "EngineVersion": "5.7.mysql_aurora.2.10.1",
+        "MasterUserPassword": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{{resolve:secretsmanager:",
+              Object {
+                "Ref": "MagentoDatabasePassword6693C54A",
+              },
+              ":SecretString:::}}",
+            ],
+          ],
+        },
+        "MasterUsername": "magentouser",
+        "VpcSecurityGroupIds": Array [
+          Object {
+            "Fn::GetAtt": Array [
+              "magentoRDSSecurityGroup34C939E6",
+              "GroupId",
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBCluster",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MagentoAuroraClusterInstance193B53C35": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "VPCPrivateSubnet1DefaultRouteAE1D6490",
+        "VPCPrivateSubnet2DefaultRouteF4F5CFD2",
+      ],
+      "Properties": Object {
+        "DBClusterIdentifier": Object {
+          "Ref": "MagentoAuroraCluster576B8023",
+        },
+        "DBInstanceClass": "db.r6g.large",
+        "DBSubnetGroupName": Object {
+          "Ref": "MagentoAuroraClusterSubnets1D05994E",
+        },
+        "Engine": "aurora-mysql",
+        "EngineVersion": "5.7.mysql_aurora.2.10.1",
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MagentoAuroraClusterSubnets1D05994E": Object {
+      "Properties": Object {
+        "DBSubnetGroupDescription": "Subnets for MagentoAuroraCluster database",
+        "SubnetIds": Array [
+          Object {
+            "Ref": "VPCPrivateSubnet1Subnet8BCA10E0",
+          },
+          Object {
+            "Ref": "VPCPrivateSubnet2SubnetCFCDAA7A",
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "MagentoDatabasePassword6693C54A": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Description": "magento Database password for magento",
+        "GenerateSecretString": Object {
+          "ExcludeCharacters": "|-,'\\":@/<>;",
+          "ExcludePunctuation": true,
+          "IncludeSpace": false,
+        },
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ECSKmsKey6C68CB5D",
+            "Arn",
+          ],
+        },
+        "Name": "magento-magento-database-password",
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MagentoServiceMagentoServiceALBDFAB92E2": Object {
+      "DependsOn": Array [
+        "VPCPublicSubnet1DefaultRoute91CEF279",
+        "VPCPublicSubnet2DefaultRouteB7481BBA",
+      ],
+      "Properties": Object {
+        "LoadBalancerAttributes": Array [
+          Object {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+        ],
+        "Name": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "ecs-",
+              Object {
+                "Ref": "ClusterEB0386A7",
+              },
+              "MagentoService",
+            ],
+          ],
+        },
+        "Scheme": "internet-facing",
+        "SecurityGroups": Array [
+          Object {
+            "Fn::GetAtt": Array [
+              "MagentoServiceMagentoServiceALBSecurityGroup6D8F18F5",
+              "GroupId",
+            ],
+          },
+        ],
+        "Subnets": Array [
+          Object {
+            "Ref": "VPCPublicSubnet1SubnetB4246D30",
+          },
+          Object {
+            "Ref": "VPCPublicSubnet2Subnet74179F39",
+          },
+        ],
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "ecs-",
+                  Object {
+                    "Ref": "ClusterEB0386A7",
+                  },
+                  "MagentoService",
+                ],
+              ],
+            },
+          },
+        ],
+        "Type": "application",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "MagentoServiceMagentoServiceALBMagentoServiceListener8F85A69A": Object {
+      "Properties": Object {
+        "Certificates": Array [
+          Object {
+            "CertificateArn": Object {
+              "Ref": "MagentoServiceCertArnParameterParameterAD41925C",
+            },
+          },
+        ],
+        "DefaultActions": Array [
+          Object {
+            "TargetGroupArn": Object {
+              "Ref": "MagentoServiceMagentoServiceALBMagentoServiceListenerMagentoServiceTargetsGroup69B87B3F",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": Object {
+          "Ref": "MagentoServiceMagentoServiceALBDFAB92E2",
+        },
+        "Port": 443,
+        "Protocol": "HTTPS",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "MagentoServiceMagentoServiceALBMagentoServiceListenerMagentoServiceTargetsGroup69B87B3F": Object {
+      "Properties": Object {
+        "HealthCheckIntervalSeconds": 40,
+        "HealthCheckPath": "/",
+        "HealthCheckTimeoutSeconds": 30,
+        "HealthyThresholdCount": 2,
+        "Matcher": Object {
+          "HttpCode": "200-499",
+        },
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "ecs-",
+                  Object {
+                    "Ref": "ClusterEB0386A7",
+                  },
+                  "MagentoService",
+                ],
+              ],
+            },
+          },
+        ],
+        "TargetGroupAttributes": Array [
+          Object {
+            "Key": "deregistration_delay.timeout_seconds",
+            "Value": "300",
+          },
+          Object {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 10,
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "MagentoServiceMagentoServiceALBSecurityGroup6D8F18F5": Object {
+      "Properties": Object {
+        "GroupDescription": "Automatically created Security Group for ELB magentoMagentoServiceMagentoServiceALB086158B6",
+        "SecurityGroupIngress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow from anyone on port 443",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "ecs-",
+                  Object {
+                    "Ref": "ClusterEB0386A7",
+                  },
+                  "MagentoService",
+                ],
+              ],
+            },
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "MagentoServiceMagentoServiceALBSecurityGrouptomagentoserviceSecurityGroup68113116808083FF1D2A": Object {
+      "Properties": Object {
+        "Description": "Load balancer to target",
+        "DestinationSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+        "FromPort": 8080,
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "MagentoServiceMagentoServiceALBSecurityGroup6D8F18F5",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "MagentoServiceMagentoServiceAliasRecord4ABBF077": Object {
+      "Properties": Object {
+        "AliasTarget": Object {
+          "DNSName": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "dualstack.",
+                Object {
+                  "Fn::GetAtt": Array [
+                    "MagentoServiceMagentoServiceALBDFAB92E2",
+                    "DNSName",
+                  ],
+                },
+              ],
+            ],
+          },
+          "HostedZoneId": Object {
+            "Fn::GetAtt": Array [
+              "MagentoServiceMagentoServiceALBDFAB92E2",
+              "CanonicalHostedZoneID",
+            ],
+          },
+        },
+        "HostedZoneId": "DUMMY",
+        "Name": "magento.magento.mydomain.com.",
+        "Type": "A",
+      },
+      "Type": "AWS::Route53::RecordSet",
+    },
+    "MagentoServiceServiceMagentoService0563DA5B": Object {
+      "DependsOn": Array [
+        "MagentoServiceMagentoServiceALBMagentoServiceListenerMagentoServiceTargetsGroup69B87B3F",
+        "MagentoServiceMagentoServiceALBMagentoServiceListener8F85A69A",
+      ],
+      "Properties": Object {
+        "Cluster": Object {
+          "Ref": "ClusterEB0386A7",
+        },
+        "DeploymentConfiguration": Object {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 50,
+        },
+        "EnableECSManagedTags": false,
+        "EnableExecuteCommand": true,
+        "HealthCheckGracePeriodSeconds": 120,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": Array [
+          Object {
+            "ContainerName": "magento",
+            "ContainerPort": 8080,
+            "TargetGroupArn": Object {
+              "Ref": "MagentoServiceMagentoServiceALBMagentoServiceListenerMagentoServiceTargetsGroup69B87B3F",
+            },
+          },
+        ],
+        "NetworkConfiguration": Object {
+          "AwsvpcConfiguration": Object {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": Array [
+              Object {
+                "Fn::GetAtt": Array [
+                  "serviceSecurityGroupED3E18CA",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": Array [
+              Object {
+                "Ref": "VPCPrivateSubnet1Subnet8BCA10E0",
+              },
+              Object {
+                "Ref": "VPCPrivateSubnet2SubnetCFCDAA7A",
+              },
+            ],
+          },
+        },
+        "PlatformVersion": "1.4.0",
+        "ServiceName": "MagentoService",
+        "TaskDefinition": Object {
+          "Ref": "MagentoServiceTaskDefMagentoService85828845",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "MagentoServiceServiceMagentoServiceTaskCountTarget913272EB": Object {
+      "Properties": Object {
+        "MaxCapacity": 30,
+        "MinCapacity": 1,
+        "ResourceId": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "service/",
+              Object {
+                "Ref": "ClusterEB0386A7",
+              },
+              "/",
+              Object {
+                "Fn::GetAtt": Array [
+                  "MagentoServiceServiceMagentoService0563DA5B",
+                  "Name",
+                ],
+              },
+            ],
+          ],
+        },
+        "RoleARN": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":iam::1234567890:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+            ],
+          ],
+        },
+        "ScalableDimension": "ecs:service:DesiredCount",
+        "ServiceNamespace": "ecs",
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+    },
+    "MagentoServiceServiceMagentoServiceTaskCountTargetCpuScalingC6BD5F8E": Object {
+      "Properties": Object {
+        "PolicyName": "magentoMagentoServiceServiceMagentoServiceTaskCountTargetCpuScaling77B15227",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": Object {
+          "Ref": "MagentoServiceServiceMagentoServiceTaskCountTarget913272EB",
+        },
+        "TargetTrackingScalingPolicyConfiguration": Object {
+          "DisableScaleIn": false,
+          "PredefinedMetricSpecification": Object {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization",
+          },
+          "ScaleInCooldown": 10,
+          "ScaleOutCooldown": 10,
+          "TargetValue": 60,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "MagentoServiceServiceMagentoServiceTaskCountTargetMemoryScaling926D5E55": Object {
+      "Properties": Object {
+        "PolicyName": "magentoMagentoServiceServiceMagentoServiceTaskCountTargetMemoryScaling1AF95EBD",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": Object {
+          "Ref": "MagentoServiceServiceMagentoServiceTaskCountTarget913272EB",
+        },
+        "TargetTrackingScalingPolicyConfiguration": Object {
+          "DisableScaleIn": false,
+          "PredefinedMetricSpecification": Object {
+            "PredefinedMetricType": "ECSServiceAverageMemoryUtilization",
+          },
+          "ScaleInCooldown": 10,
+          "ScaleOutCooldown": 10,
+          "TargetValue": 60,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "MagentoServiceTaskDefMagentoService85828845": Object {
+      "Properties": Object {
+        "ContainerDefinitions": Array [
+          Object {
+            "Cpu": 2048,
+            "Environment": Array [
+              Object {
+                "Name": "BITNAMI_DEBUG",
+                "Value": "true",
+              },
+              Object {
+                "Name": "MAGENTO_USERNAME",
+                "Value": "magento",
+              },
+              Object {
+                "Name": "MAGENTO_ADMIN_TASK",
+                "Value": "no",
+              },
+              Object {
+                "Name": "MAGENTO_DEPLOY_STATIC_CONTENT",
+                "Value": "no",
+              },
+              Object {
+                "Name": "MAGENTO_SKIP_REINDEX",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_SKIP_BOOTSTRAP",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_EXTRA_INSTALL_ARGS",
+                "Value": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "--cache-backend=redis --cache-backend-redis-server=",
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "RedisCluster",
+                          "RedisEndpoint.Address",
+                        ],
+                      },
+                      " --cache-backend-redis-port=6379 --cache-backend-redis-db=0 --session-save=redis --session-save-redis-host=",
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "RedisCluster",
+                          "RedisEndpoint.Address",
+                        ],
+                      },
+                      " --session-save-redis-db=2",
+                    ],
+                  ],
+                },
+              },
+              Object {
+                "Name": "MAGENTO_HOST",
+                "Value": "magento.magento.mydomain.com",
+              },
+              Object {
+                "Name": "MAGENTO_ENABLE_HTTPS",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_ENABLE_ADMIN_HTTPS",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_MODE",
+                "Value": "production",
+              },
+              Object {
+                "Name": "MAGENTO_USE_FS",
+                "Value": "no",
+              },
+              Object {
+                "Name": "MAGENTO_DATABASE_HOST",
+                "Value": Object {
+                  "Fn::GetAtt": Array [
+                    "MagentoAuroraCluster576B8023",
+                    "Endpoint.Address",
+                  ],
+                },
+              },
+              Object {
+                "Name": "MAGENTO_DATABASE_PORT_NUMBER",
+                "Value": "3306",
+              },
+              Object {
+                "Name": "MAGENTO_DATABASE_USER",
+                "Value": "magentouser",
+              },
+              Object {
+                "Name": "MAGENTO_DATABASE_NAME",
+                "Value": "magento",
+              },
+              Object {
+                "Name": "ELASTICSEARCH_HOST",
+                "Value": Object {
+                  "Fn::GetAtt": Array [
+                    "Domain66AC69E0",
+                    "DomainEndpoint",
+                  ],
+                },
+              },
+              Object {
+                "Name": "ELASTICSEARCH_PORT_NUMBER",
+                "Value": "443",
+              },
+              Object {
+                "Name": "MAGENTO_ELASTICSEARCH_USE_HTTPS",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_ELASTICSEARCH_ENABLE_AUTH",
+                "Value": "yes",
+              },
+              Object {
+                "Name": "MAGENTO_ELASTICSEARCH_USER",
+                "Value": "magento-os-master",
+              },
+              Object {
+                "Name": "PHP_MEMORY_LIMIT",
+                "Value": "7G",
+              },
+            ],
+            "Essential": true,
+            "Image": Object {
+              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:9061e5a5a7277a892a21d1e136e25ec6c02e5cc00947377a7d69f38dd859eb3f",
+            },
+            "LogConfiguration": Object {
+              "LogDriver": "awslogs",
+              "Options": Object {
+                "awslogs-group": Object {
+                  "Ref": "MagentoServiceTaskDefMagentoServicemagentoLogGroup86B7CD18",
+                },
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "service",
+                "mode": "non-blocking",
+              },
+            },
+            "Memory": 8192,
+            "Name": "magento",
+            "PortMappings": Array [
+              Object {
+                "ContainerPort": 8080,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": Array [
+              Object {
+                "Name": "MAGENTO_PASSWORD",
+                "ValueFrom": Object {
+                  "Ref": "magentoAdminPasswordF18EEDF3",
+                },
+              },
+              Object {
+                "Name": "MAGENTO_DATABASE_PASSWORD",
+                "ValueFrom": Object {
+                  "Ref": "MagentoDatabasePassword6693C54A",
+                },
+              },
+              Object {
+                "Name": "MAGENTO_ELASTICSEARCH_PASSWORD",
+                "ValueFrom": Object {
+                  "Ref": "opensearchAdminPasswordF9AAABC9",
+                },
+              },
+              Object {
+                "Name": "MAGENTO_MARKETPLACE_PUBLIC_KEY",
+                "ValueFrom": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":secretsmanager:us-east-1:1234567890:secret:MAGENTO_MARKETPLACE:public-key::",
+                    ],
+                  ],
+                },
+              },
+              Object {
+                "Name": "MAGENTO_MARKETPLACE_PRIVATE_KEY",
+                "ValueFrom": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":secretsmanager:us-east-1:1234567890:secret:MAGENTO_MARKETPLACE:private-key::",
+                    ],
+                  ],
+                },
+              },
+            ],
+            "User": "daemon",
+          },
+        ],
+        "Cpu": "2048",
+        "ExecutionRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "MagentoServiceTaskDefMagentoServiceExecutionRoleD8E8A4AF",
+            "Arn",
+          ],
+        },
+        "Family": "magentoMagentoServiceTaskDefMagentoService88CCF536",
+        "Memory": "8192",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": Array [
+          "FARGATE",
+        ],
+        "TaskRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "MagentoServiceTaskDefMagentoServiceExecutionRoleD8E8A4AF": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MagentoServiceTaskDefMagentoServiceExecutionRoleDefaultPolicy714BE1F5": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ecr:us-east-1:1234567890:repository/cdk-hnb659fds-container-assets-1234567890-us-east-1",
+                  ],
+                ],
+              },
+            },
+            Object {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "MagentoServiceTaskDefMagentoServicemagentoLogGroup86B7CD18",
+                  "Arn",
+                ],
+              },
+            },
+            Object {
+              "Action": Array [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Ref": "magentoAdminPasswordF18EEDF3",
+              },
+            },
+            Object {
+              "Action": Array [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Ref": "MagentoDatabasePassword6693C54A",
+              },
+            },
+            Object {
+              "Action": Array [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Ref": "opensearchAdminPasswordF9AAABC9",
+              },
+            },
+            Object {
+              "Action": Array [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:us-east-1:1234567890:secret:MAGENTO_MARKETPLACE-??????",
+                  ],
+                ],
+              },
+            },
+            Object {
+              "Action": Array [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MagentoServiceTaskDefMagentoServiceExecutionRoleDefaultPolicy714BE1F5",
+        "Roles": Array [
+          Object {
+            "Ref": "MagentoServiceTaskDefMagentoServiceExecutionRoleD8E8A4AF",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "kms:Decrypt",
+                "kms:GenerateDataKey",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "ECSKmsKey6C68CB5D",
+                  "Arn",
+                ],
+              },
+            },
+            Object {
+              "Action": "logs:DescribeLogGroups",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":logs:us-east-1:1234567890:log-group:",
+                    Object {
+                      "Ref": "ECSExecLogGroup95B1C6C8",
+                    },
+                    ":*",
+                  ],
+                ],
+              },
+            },
+            Object {
+              "Action": "s3:GetBucketLocation",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": "s3:PutObject",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":s3:::",
+                    Object {
+                      "Ref": "EcsExecBucket4F468651",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+            Object {
+              "Action": "s3:GetEncryptionConfiguration",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":s3:::",
+                    Object {
+                      "Ref": "EcsExecBucket4F468651",
+                    },
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2",
+        "Roles": Array [
+          Object {
+            "Ref": "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MagentoServiceTaskDefMagentoServicemagentoLogGroup86B7CD18": Object {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "NFSAllowAllSG1B23B86D": Object {
+      "Properties": Object {
+        "GroupDescription": "allow 2049 inbound for ec2",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "SecurityGroupIngress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "allow 2049 inbound from ec2",
+            "FromPort": 2049,
+            "IpProtocol": "tcp",
+            "ToPort": 2049,
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "RedisCluster": Object {
+      "DependsOn": Array [
+        "RedisClusterPrivateSubnetGroup",
+      ],
+      "Properties": Object {
+        "CacheNodeType": "cache.r6g.large",
+        "CacheSubnetGroupName": "magento-redis-cache",
+        "ClusterName": "magentomagento-elasticache",
+        "Engine": "redis",
+        "NumCacheNodes": 1,
+        "VpcSecurityGroupIds": Array [
+          Object {
+            "Fn::GetAtt": Array [
+              "ElasticacheSecurityGroup5E2118FC",
+              "GroupId",
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::ElastiCache::CacheCluster",
+    },
+    "RedisClusterPrivateSubnetGroup": Object {
+      "Properties": Object {
+        "CacheSubnetGroupName": "magento-redis-cache",
+        "Description": "Private Subnet Group for Magento Elasticache",
+        "SubnetIds": Array [
+          Object {
+            "Ref": "VPCPrivateSubnet1Subnet8BCA10E0",
+          },
+          Object {
+            "Ref": "VPCPrivateSubnet2SubnetCFCDAA7A",
+          },
+        ],
+      },
+      "Type": "AWS::ElastiCache::SubnetGroup",
+    },
+    "VPCB9E5F0B4": Object {
+      "Properties": Object {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "VPCIGWB7E252D3": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "VPCPrivateSubnet1DefaultRouteAE1D6490": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "VPCPublicSubnet1NATGatewayE0556630",
+        },
+        "RouteTableId": Object {
+          "Ref": "VPCPrivateSubnet1RouteTableBE8A6027",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VPCPrivateSubnet1RouteTableAssociation347902D1": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "VPCPrivateSubnet1RouteTableBE8A6027",
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPrivateSubnet1Subnet8BCA10E0",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VPCPrivateSubnet1RouteTableBE8A6027": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VPCPrivateSubnet1Subnet8BCA10E0": Object {
+      "Properties": Object {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.0.128.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VPCPrivateSubnet2DefaultRouteF4F5CFD2": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "VPCPublicSubnet2NATGateway3C070193",
+        },
+        "RouteTableId": Object {
+          "Ref": "VPCPrivateSubnet2RouteTable0A19E10E",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VPCPrivateSubnet2RouteTable0A19E10E": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VPCPrivateSubnet2RouteTableAssociation0C73D413": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "VPCPrivateSubnet2RouteTable0A19E10E",
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPrivateSubnet2SubnetCFCDAA7A",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VPCPrivateSubnet2SubnetCFCDAA7A": Object {
+      "Properties": Object {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.0.192.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VPCPublicSubnet1DefaultRoute91CEF279": Object {
+      "DependsOn": Array [
+        "VPCVPCGW99B986DC",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "VPCIGWB7E252D3",
+        },
+        "RouteTableId": Object {
+          "Ref": "VPCPublicSubnet1RouteTableFEE4B781",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VPCPublicSubnet1EIP6AD938E8": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "VPCPublicSubnet1NATGatewayE0556630": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "VPCPublicSubnet1EIP6AD938E8",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPublicSubnet1SubnetB4246D30",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "VPCPublicSubnet1RouteTableAssociation0B0896DC": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "VPCPublicSubnet1RouteTableFEE4B781",
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPublicSubnet1SubnetB4246D30",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VPCPublicSubnet1RouteTableFEE4B781": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VPCPublicSubnet1SubnetB4246D30": Object {
+      "Properties": Object {
+        "AvailabilityZone": "dummy1a",
+        "CidrBlock": "10.0.0.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VPCPublicSubnet2DefaultRouteB7481BBA": Object {
+      "DependsOn": Array [
+        "VPCVPCGW99B986DC",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "VPCIGWB7E252D3",
+        },
+        "RouteTableId": Object {
+          "Ref": "VPCPublicSubnet2RouteTable6F1A15F1",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VPCPublicSubnet2EIP4947BC00": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "VPCPublicSubnet2NATGateway3C070193": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "VPCPublicSubnet2EIP4947BC00",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPublicSubnet2Subnet74179F39",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "VPCPublicSubnet2RouteTable6F1A15F1": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VPCPublicSubnet2RouteTableAssociation5A808732": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "VPCPublicSubnet2RouteTable6F1A15F1",
+        },
+        "SubnetId": Object {
+          "Ref": "VPCPublicSubnet2Subnet74179F39",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VPCPublicSubnet2Subnet74179F39": Object {
+      "Properties": Object {
+        "AvailabilityZone": "dummy1b",
+        "CidrBlock": "10.0.64.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "magento/VPC/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VPCVPCGW99B986DC": Object {
+      "Properties": Object {
+        "InternetGatewayId": Object {
+          "Ref": "VPCIGWB7E252D3",
+        },
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+    "albSG8D3A1F76": Object {
+      "Properties": Object {
+        "GroupDescription": "allow 80 and 443",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "SecurityGroupIngress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "allow 80 inbound",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "allow 443 inbound",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "ec2SGD28476DB": Object {
+      "Properties": Object {
+        "GroupDescription": "allow 22 inbound for ec2",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "SecurityGroupIngress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "allow 22 inbound from ec2",
+            "FromPort": 22,
+            "IpProtocol": "tcp",
+            "ToPort": 22,
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "magentoAdminPasswordF18EEDF3": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Description": "magento password for magento",
+        "GenerateSecretString": Object {
+          "ExcludeCharacters": "|-,'\\"",
+          "ExcludePunctuation": true,
+          "IncludeSpace": false,
+        },
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ECSKmsKey6C68CB5D",
+            "Arn",
+          ],
+        },
+        "Name": "magento-magento",
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "magentoRDSSecurityGroup34C939E6": Object {
+      "Properties": Object {
+        "GroupDescription": "allow 3306 inbound",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "SecurityGroupIngress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "allow 3306 inbound from lambda",
+            "FromPort": 3306,
+            "IpProtocol": "tcp",
+            "ToPort": 3306,
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "openSearchSecurityGroupDC64666B": Object {
+      "Properties": Object {
+        "GroupDescription": "allow All inbound",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "openSearchSecurityGroupfrommagentoserviceSecurityGroup68113116ALLTRAFFICF83564C5": Object {
+      "Properties": Object {
+        "Description": "allow traffic fom ECS service",
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "openSearchSecurityGroupDC64666B",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "opensearchAdminPasswordF9AAABC9": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Description": "magento Opensearch Admin password for magento",
+        "GenerateSecretString": Object {
+          "ExcludeCharacters": "|-,'\\":@/<>;()[]{}/&\`?#*.%$!~^_+",
+          "ExcludePunctuation": false,
+          "IncludeSpace": false,
+        },
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ECSKmsKey6C68CB5D",
+            "Arn",
+          ],
+        },
+        "Name": "magento-magento-opensearch-admin-password",
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "serviceSecurityGroupED3E18CA": Object {
+      "Properties": Object {
+        "GroupDescription": "ecs service securitygroup",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "VPCB9E5F0B4",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "serviceSecurityGroupfrommagentoMagentoServiceMagentoServiceALBSecurityGroupC4896C7580809128556B": Object {
+      "Properties": Object {
+        "Description": "Load balancer to target",
+        "FromPort": 8080,
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "MagentoServiceMagentoServiceALBSecurityGroup6D8F18F5",
+            "GroupId",
+          ],
+        },
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "serviceSecurityGroupfrommagentoopenSearchSecurityGroup54CE8C95ALLTRAFFIC9CD4D83B": Object {
+      "Properties": Object {
+        "Description": "allow traffic fom Opensearch",
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "serviceSecurityGroupED3E18CA",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "openSearchSecurityGroupDC64666B",
+            "GroupId",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
