@@ -2172,11 +2172,11 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         },
         "PlacementStrategies": Array [
           Object {
-            "Field": "memory",
+            "Field": "MEMORY",
             "Type": "binpack",
           },
           Object {
-            "Field": "cpu",
+            "Field": "CPU",
             "Type": "binpack",
           },
           Object {
