@@ -557,9 +557,6 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           "InstanceType": "r5.large.search",
           "ZoneAwarenessEnabled": false,
         },
-        "CognitoOptions": Object {
-          "Enabled": false,
-        },
         "DomainEndpointOptions": Object {
           "EnforceHTTPS": true,
           "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",

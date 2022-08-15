@@ -317,9 +317,6 @@ Object {
           "InstanceType": "r5.large.search",
           "ZoneAwarenessEnabled": false,
         },
-        "CognitoOptions": Object {
-          "Enabled": false,
-        },
         "DomainEndpointOptions": Object {
           "EnforceHTTPS": true,
           "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
@@ -3137,9 +3134,6 @@ Object {
           "InstanceCount": 1,
           "InstanceType": "r5.large.search",
           "ZoneAwarenessEnabled": false,
-        },
-        "CognitoOptions": Object {
-          "Enabled": false,
         },
         "DomainEndpointOptions": Object {
           "EnforceHTTPS": true,
