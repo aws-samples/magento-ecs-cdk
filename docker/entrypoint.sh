@@ -38,7 +38,7 @@ if [[ "$1" = "/opt/bitnami/scripts/magento/run.sh" || "$1" = "/opt/bitnami/scrip
     #Accelerate the boot for additional tasks by disabling setup:upgrade
      if [[ "$MAGENTO_ADMIN_TASK" = "no" ]]; then
        sed -i 's/        info "Upgrading database schema"/        info "DISABLE Upgrading database schema"/' /opt/bitnami/scripts/libmagento.sh
-       sed -i 's/        magento_execute setup:upgrade/        #magento_execute setup:upgrade/' /opt/bitnami/scripts/libmagento.sh
+       sed -i 's/        magento_execute setup:upgrade/        info "DISABLE Upgrading database schema" #magento_execute setup:upgrade/' /opt/bitnami/scripts/libmagento.sh
     fi
     
     /opt/bitnami/scripts/magento/setup.sh
