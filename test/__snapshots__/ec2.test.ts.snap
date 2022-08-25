@@ -1506,7 +1506,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
             "Essential": true,
             "Image": Object {
-              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:fe0837a58a471887980d06b385da70a54e18d3a8edb83ad843bc4e91235c746d",
+              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:ca4728ab8c88c1b3696d6f5b72909a7d9a92c850e2608d0233de1d0d9c0d0a83",
             },
             "LogConfiguration": Object {
               "LogDriver": "awslogs",
@@ -2403,7 +2403,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
             "Essential": true,
             "Image": Object {
-              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:fe0837a58a471887980d06b385da70a54e18d3a8edb83ad843bc4e91235c746d",
+              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:ca4728ab8c88c1b3696d6f5b72909a7d9a92c850e2608d0233de1d0d9c0d0a83",
             },
             "LogConfiguration": Object {
               "LogDriver": "awslogs",
