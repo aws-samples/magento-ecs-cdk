@@ -931,7 +931,9 @@ Object {
       "DeletionPolicy": "Delete",
       "DependsOn": Array [
         "VPCPrivateSubnet1DefaultRouteAE1D6490",
+        "VPCPrivateSubnet1RouteTableAssociation347902D1",
         "VPCPrivateSubnet2DefaultRouteF4F5CFD2",
+        "VPCPrivateSubnet2RouteTableAssociation0C73D413",
       ],
       "Properties": Object {
         "DBClusterIdentifier": Object {
@@ -984,7 +986,9 @@ Object {
     "MagentoServiceMagentoServiceALBDFAB92E2": Object {
       "DependsOn": Array [
         "VPCPublicSubnet1DefaultRoute91CEF279",
+        "VPCPublicSubnet1RouteTableAssociation0B0896DC",
         "VPCPublicSubnet2DefaultRouteB7481BBA",
+        "VPCPublicSubnet2RouteTableAssociation5A808732",
       ],
       "Properties": Object {
         "LoadBalancerAttributes": Array [
@@ -2059,6 +2063,10 @@ Object {
       "Type": "AWS::EC2::EIP",
     },
     "VPCPublicSubnet1NATGatewayE0556630": Object {
+      "DependsOn": Array [
+        "VPCPublicSubnet1DefaultRoute91CEF279",
+        "VPCPublicSubnet1RouteTableAssociation0B0896DC",
+      ],
       "Properties": Object {
         "AllocationId": Object {
           "Fn::GetAtt": Array [
@@ -2156,6 +2164,10 @@ Object {
       "Type": "AWS::EC2::EIP",
     },
     "VPCPublicSubnet2NATGateway3C070193": Object {
+      "DependsOn": Array [
+        "VPCPublicSubnet2DefaultRouteB7481BBA",
+        "VPCPublicSubnet2RouteTableAssociation5A808732",
+      ],
       "Properties": Object {
         "AllocationId": Object {
           "Fn::GetAtt": Array [
