@@ -23,7 +23,6 @@
     "synth": "npx projen synth",
     "synth:silent": "npx projen synth:silent",
     "test": "npx projen test",
-    "test:update": "npx projen test:update",
     "test:watch": "npx projen test:watch",
     "upgrade": "npx projen upgrade",
     "watch": "npx projen watch",
@@ -39,7 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "aws-cdk": "^2.29.1",
-    "esbuild": "^0.15.9",
+    "esbuild": "^0.15.10",
     "eslint": "^8",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-import-resolver-typescript": "^3.5.1",
@@ -48,10 +47,10 @@
     "jest-junit": "^13",
     "json-schema": "^0.4.0",
     "npm-check-updates": "^15",
-    "projen": "^0.62.19",
+    "projen": "^0.63.0",
     "ts-jest": "^28.0.8",
     "ts-node": "^10",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.4"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.29.1",
