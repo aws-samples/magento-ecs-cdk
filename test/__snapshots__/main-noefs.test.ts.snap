@@ -109,7 +109,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
-          "S3Key": "6dbd112fe448437b3438da4382c72fccbb7d2ee1543db222620d7447fffebc50.zip",
+          "S3Key": "e845402ce43b66fc6f20df4a239f20f8662eb6c7f920b94cf6542dd0e64ce0f7.zip",
         },
         "Handler": "index.handler",
         "Role": Object {
@@ -208,7 +208,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
-          "S3Key": "e57c1acaa363d7d2b81736776007a7091bc73dff4aeb8135627c4511a51e7dca.zip",
+          "S3Key": "6babbac1f25446ab4660ead0ad5972e3a7742f50c6d8326af98a8bcd5d485335.zip",
         },
         "Description": Object {
           "Fn::Join": Array [
