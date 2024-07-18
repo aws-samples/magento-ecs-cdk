@@ -11,7 +11,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   keywords: ['aws', 'constructs', 'cdk', 'ecs', 'magento', 'fargate', 'opensearch', 'efs', 'fsx'],
   description:
     'CDK Project to deploy Magento Applications on top of AWS ECS, FARGATE/EC2, EFS/FsX Ontap, RDS, OpenSearch, ElastiCashe',
-  cdkVersion: '2.29.1',
+  cdkVersion: '2.149.0',
   defaultReleaseBranch: 'main',
   license: 'MIT-0',
   name: 'magento-ecs-cdk',
@@ -23,7 +23,8 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
       secret: AUTOMATION_TOKEN,
-    },
+    },  
+    separateUpgrades: true,
   },
 
   autoApproveOptions: {
@@ -52,23 +53,26 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     magentoMinTasks: 10,
     magentoMaxTasks: 100,
 
-    //route53_domain_zone: 'sallaman.people.aws.dev', // You need ot provide a valide AWS Route53 Hosted Zone.
+    route53_domain_zone: 'sallaman.people.aws.dev', // You need ot provide a valide AWS Route53 Hosted Zone.
 
     magento_admin_task: 'yes',
     magento_admin_task_debug: 'no',
   },
 
-  gitignore: ['cdk.out', 'cdk.context.json', '*.d.ts', '*.js', 'CMD', '.projenrc.js-*', '.env*', '.vscode'],
+  gitignore: [
+    'cdk.out',
+    'cdk.context.json',
+    '*.d.ts',
+    '*.js',
+    'CMD',
+    '.projenrc.js-*',
+    '.env*',
+    '.vscode',
+  ],
 
-  // cdkDependencies: undefined,  /* Which AWS CDK modules (those that start with "@aws-cdk/") this app uses. */
-  // deps: [],                    /* Runtime dependencies of this module. */
-  // description: undefined,      /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],                 /* Build dependencies for this module. */
-  // packageName: undefined,      /* The "name" in package.json. */
-  // release: undefined,          /* Add release management to this project. */
+  devDeps: ['cdk-nag'], /* Build dependencies for this module. */
+
 });
 
-//Fix for this issue https://github.com/projen/projen/issues/1885
-project.addDevDeps('ts-node@^10');
 
 project.synth();

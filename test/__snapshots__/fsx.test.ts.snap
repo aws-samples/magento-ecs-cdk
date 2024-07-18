@@ -159,7 +159,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
-          "S3Key": "e845402ce43b66fc6f20df4a239f20f8662eb6c7f920b94cf6542dd0e64ce0f7.zip",
+          "S3Key": "97f30e67419a1676a2215492723e5add1aa491caf0cbe2dd878fc4fab0468cd4.zip",
         },
         "Handler": "index.handler",
         "Role": Object {
@@ -168,7 +168,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "Timeout": 120,
       },
       "Type": "AWS::Lambda::Function",
@@ -401,6 +401,11 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
       },
       "Type": "AWS::IAM::Policy",
     },
+    "Bucket83908E77": Object {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
     "CP1A08C5A07": Object {
       "Properties": Object {
         "AutoScalingGroupProvider": Object {
@@ -476,7 +481,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
       "Properties": Object {
         "Code": Object {
           "S3Bucket": "cdk-hnb659fds-assets-1234567890-us-east-1",
-          "S3Key": "6babbac1f25446ab4660ead0ad5972e3a7742f50c6d8326af98a8bcd5d485335.zip",
+          "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
         },
         "Description": Object {
           "Fn::Join": Array [
@@ -490,7 +495,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
           ],
         },
-        "Handler": "__entrypoint__.handler",
+        "Handler": "index.handler",
         "MemorySize": 128,
         "Role": Object {
           "Fn::GetAtt": Array [
@@ -498,7 +503,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs20.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -665,7 +670,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
           ],
         },
-        "InstallLatestAwsSdk": true,
+        "InstallLatestAwsSdk": false,
         "ServiceToken": Object {
           "Fn::GetAtt": Array [
             "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
@@ -742,7 +747,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
           ],
         },
-        "Delete": "{\\"service\\":\\"CloudWatchLogs\\",\\"action\\":\\"deleteResourcePolicy\\",\\"parameters\\":{\\"policyName\\":\\"ESLogPolicyc84126e83aed825c440510351cb06dac09eabca376\\"},\\"ignoreErrorCodesMatching\\":\\"400\\"}",
+        "Delete": "{\\"service\\":\\"CloudWatchLogs\\",\\"action\\":\\"deleteResourcePolicy\\",\\"parameters\\":{\\"policyName\\":\\"ESLogPolicyc84126e83aed825c440510351cb06dac09eabca376\\"},\\"ignoreErrorCodesMatching\\":\\"ResourceNotFoundException\\"}",
         "InstallLatestAwsSdk": true,
         "ServiceToken": Object {
           "Fn::GetAtt": Array [
@@ -1061,6 +1066,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           "Statement": Array [
             Object {
               "Action": Array [
+                "s3:PutBucketPolicy",
                 "s3:GetBucket*",
                 "s3:List*",
                 "s3:DeleteObject*",
@@ -1183,7 +1189,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         },
         "DatabaseName": "magento",
         "Engine": "aurora-mysql",
-        "EngineVersion": "5.7.mysql_aurora.2.10.1",
+        "EngineVersion": "5.7.mysql_aurora.2.12.2",
         "MasterUserPassword": Object {
           "Fn::Join": Array [
             "",
@@ -1257,6 +1263,8 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
     "MagentoServiceAdminServiceMagentoServiceAdminService2DF18265": Object {
       "DependsOn": Array [
         "Cluster3DA9CCBA",
+        "MagentoServiceAdminTaskDefMagentoServiceAdminTaskRoleDefaultPolicy7057665D",
+        "MagentoServiceAdminTaskDefMagentoServiceAdminTaskRole81B0D5A4",
       ],
       "Properties": Object {
         "CapacityProviderStrategy": Array [
@@ -1271,6 +1279,11 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           "Ref": "ClusterEB0386A7",
         },
         "DeploymentConfiguration": Object {
+          "Alarms": Object {
+            "AlarmNames": Array [],
+            "Enable": false,
+            "Rollback": false,
+          },
           "MaximumPercent": 200,
           "MinimumHealthyPercent": 50,
         },
@@ -1425,6 +1438,10 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
               Object {
                 "Name": "PHP_MEMORY_LIMIT",
                 "Value": "7G",
+              },
+              Object {
+                "Name": "AWS_REGION",
+                "Value": "us-east-1",
               },
             ],
             "Essential": true,
@@ -2014,6 +2031,8 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         "Cluster3DA9CCBA",
         "MagentoServiceMagentoServiceALBMagentoServiceListenerMagentoServiceTargetsGroup69B87B3F",
         "MagentoServiceMagentoServiceALBMagentoServiceListener8F85A69A",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
       ],
       "Properties": Object {
         "CapacityProviderStrategy": Array [
@@ -2028,6 +2047,11 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           "Ref": "ClusterEB0386A7",
         },
         "DeploymentConfiguration": Object {
+          "Alarms": Object {
+            "AlarmNames": Array [],
+            "Enable": false,
+            "Rollback": false,
+          },
           "MaximumPercent": 200,
           "MinimumHealthyPercent": 50,
         },
@@ -2085,6 +2109,8 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
     "MagentoServiceServiceMagentoServiceTaskCountTarget913272EB": Object {
       "DependsOn": Array [
         "Cluster3DA9CCBA",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
       ],
       "Properties": Object {
         "MaxCapacity": 30,
@@ -2127,6 +2153,8 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
     "MagentoServiceServiceMagentoServiceTaskCountTargetCpuScalingC6BD5F8E": Object {
       "DependsOn": Array [
         "Cluster3DA9CCBA",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
       ],
       "Properties": Object {
         "PolicyName": "magentoMagentoServiceServiceMagentoServiceTaskCountTargetCpuScaling77B15227",
@@ -2149,6 +2177,8 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
     "MagentoServiceServiceMagentoServiceTaskCountTargetMemoryScaling926D5E55": Object {
       "DependsOn": Array [
         "Cluster3DA9CCBA",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleDefaultPolicyDAAAE3F2",
+        "MagentoServiceTaskDefMagentoServiceTaskRoleBDBA45E7",
       ],
       "Properties": Object {
         "PolicyName": "magentoMagentoServiceServiceMagentoServiceTaskCountTargetMemoryScaling1AF95EBD",
@@ -2292,6 +2322,10 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
               Object {
                 "Name": "PHP_MEMORY_LIMIT",
                 "Value": "7G",
+              },
+              Object {
+                "Name": "AWS_REGION",
+                "Value": "us-east-1",
               },
             ],
             "Essential": true,

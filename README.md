@@ -126,6 +126,13 @@ You can find more details of available configuration parameters [here](doc/confi
 
 ## Generate and deploy
 
+### Pre-requisites:
+
+```bash
+npm install --save-dev projen 
+npm install --global yarn
+```
+
 Synthesize and generate the CloudFormation template from the CDK Typescript code:
 
 ```bash

@@ -38,3 +38,9 @@ then execute `pj` to bootstrap or upgrade your project.
 ```bash
 pj
 ```
+
+## Apply a NagPack in your application
+
+```bash
+npm install cdk-nag
+```

@@ -79,6 +79,8 @@ export class MagentoStack extends Stack {
       privateRouteTablesIds.push(subnet.routeTable.routeTableId);
     });
 
+    new Bucket(this, 'Bucket');
+
     //new CfnOutput(this, 'privateroutetableid', { value: privateRouteTablesIds });
 
     const enablePrivateLink = this.node.tryGetContext('enablePrivateLink');
@@ -409,7 +411,7 @@ export class MagentoStack extends Stack {
     const secret = magentoDatabasePassword.secretValue;
     const rdsInstanceType = this.node.tryGetContext('rdsInstanceType') || 'r6g.large';
     const db = new DatabaseCluster(this, 'MagentoAuroraCluster', {
-      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_2_10_1 }),
+      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_2_12_2 }),
       credentials: Credentials.fromPassword(DB_USER, secret),
       removalPolicy: RemovalPolicy.DESTROY,
       instances: 1,
