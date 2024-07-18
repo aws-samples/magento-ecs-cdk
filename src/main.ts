@@ -447,7 +447,7 @@ export class MagentoStack extends Stack {
       vpcSecurityGroupIds: [elastiCacheSecurityGroup.securityGroupId],
       cacheSubnetGroupName: subnetGroup.cacheSubnetGroupName,
     });
-    redis.addDependsOn(subnetGroup);
+    redis.addDependency(subnetGroup);
 
     /*
      ** Create OpenSearch cluster with fine-grained access control only
