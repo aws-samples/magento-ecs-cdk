@@ -35,6 +35,9 @@ connect:
 projen:
 	npx projen
 
+upgrade:
+	npx projen upgrade
+
 #run npx projen build in this not-connected container to simulate gh action build
 local-test:
 	 docker run -ti -v $(PWD):/src -w /src allamand/eksutils zsh    

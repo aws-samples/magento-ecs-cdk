@@ -39,7 +39,6 @@ CMD
 .projenrc.js-*
 .env*
 .vscode
-!/.projenrc.js
 /test-reports/
 junit.xml
 /coverage/
@@ -59,3 +58,4 @@ junit.xml
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+!/.projenrc.js

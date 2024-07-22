@@ -131,6 +131,8 @@ You can find more details of available configuration parameters [here](doc/confi
 ```bash
 npm install --save-dev projen 
 npm install --global yarn
+yarn install
+make upgrade
 ```
 
 Synthesize and generate the CloudFormation template from the CDK Typescript code:
