@@ -13,7 +13,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'CDK Project to deploy Magento Applications on top of AWS ECS, FARGATE/EC2, EFS/FsX Ontap, RDS, OpenSearch, ElastiCashe',
   cdkVersion: '2.149.0',
   defaultReleaseBranch: 'main',
-  license: 'MIT-0',
+  license: 'MIT',
   name: 'magento-ecs-cdk',
   repositoryUrl: 'https://github.com/aws-samples/magento-ecs-cdk.git',
   appEntrypoint: 'integ.ts',
