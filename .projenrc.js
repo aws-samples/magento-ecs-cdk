@@ -42,7 +42,19 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // Disable the default build workflow
   workflowBootstrapSteps: [],
-  buildWorkflow: true,
+  buildWorkflow: false,
+  //   workflowBootstrapSteps: [
+  //   {
+  //     name: 'Custom Bootstrap Step',
+  //     run: 'echo "This is a custom bootstrap step"',
+  //   },
+  // ],
+  // workflowBuildSteps: [
+  //   {
+  //     name: 'Custom Build Step',
+  //     run: 'npm run custom-build-script',
+  //   },
+  // ],
 
   context: {
     '@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId': true,
@@ -149,7 +161,7 @@ workflow.addJobs({
       contents: 'read',
     },
     steps: [
-      { uses: 'actions/checkout@v4', with: { 'node-version': '20.x' }  },
+      { uses: 'actions/checkout@v4', with: { 'node-version': '20.x' } },
       {
         name: 'Setup mock AWS environment',
         run: [
@@ -161,7 +173,7 @@ workflow.addJobs({
         ].join('\n'),
       },
       { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
-      { name: 'Install dependencies', run: 'yarn install --check-files'},
+      { name: 'Install dependencies', run: 'yarn install --check-files' },
       { run: 'npx projen build' },
     ],
   },

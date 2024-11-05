@@ -15,7 +15,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          node-version: 20.x
       - name: Setup mock AWS environment
         run: |-
           echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV
@@ -23,7 +25,9 @@ jobs:
           echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
           echo "CDK_DEFAULT_ACCOUNT=1234567890" >> $GITHUB_ENV
           echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
+      - name: Install dependencies
+        run: yarn install --check-files
       - run: npx projen build
