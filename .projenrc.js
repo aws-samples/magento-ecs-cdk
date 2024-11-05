@@ -32,6 +32,30 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     allowedUsernames: ['github-actions', 'github-actions[bot]', 'allamand'],
   },
 
+  githubOptions: {
+    workflows: true,
+  },
+
+  workflowNodeVersion: '18.x', // Specify the Node.js version for the workflow
+
+  workflowContainerImage: 'jsii/superchain:1-buster-slim-node18', // Optional: Use a specific container image
+
+  // Configure the build workflow
+  buildWorkflow: {
+    preBuildSteps: [
+      {
+        name: 'Setup mock AWS environment',
+        run: [
+          'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+          'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+          'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+          'echo "CDK_DEFAULT_ACCOUNT=1234567890" >> $GITHUB_ENV',
+          'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+        ].join('\n'),
+      },
+    ],
+  },
+
   context: {
     '@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId': true,
     '@aws-cdk/core:enablePartitionLiterals': true,
