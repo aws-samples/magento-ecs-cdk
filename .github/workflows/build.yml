@@ -22,10 +22,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --check-files
       - name: build
-        run: |
-          export CDK_DEFAULT_ACCOUNT=1234567890
-          export CDK_DEFAULT_REGION=us-east-1
-          npx projen build
+        run: npx projen build
       - name: Find mutations
         id: self_mutation
         run: |-

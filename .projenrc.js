@@ -33,30 +33,77 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   },
 
   context: {
-    //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
-    enablePrivateLink: 'true', // this parameter seems to works only one
+    '@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId': true,
+    '@aws-cdk/core:enablePartitionLiterals': true,
+    '@aws-cdk/aws-events:eventsTargetQueueSameAccount': true,
+    '@aws-cdk/aws-iam:standardizedServicePrincipals': true,
+    '@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker': true,
+    '@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName': true,
+    '@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy': true,
+    '@aws-cdk/aws-route53-patters:useFargateAlb': true,
+    '@aws-cdk/customresources:installLatestAwsSdkDefault': false,
+    'aws-cdk:enableDiffNoFail': true,
+    'availability-zones:account-1234567890:us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
+    'hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1': {
+      Id: '/hostedzone/MOCKZ3AMJ8IL4',
+      Name: 'magento.mydomain.com.',
+    },
+    'vpc-provider:account=1234567890:filter.tag:Name=default:region=us-east-1:returnAsymmetricSubnets=true': {
+      vpcId: 'vpc-1234567890abcdef0',
+      vpcCidrBlock: '172.31.0.0/16',
+      availabilityZones: [],
+      subnetGroups: [
+        {
+          name: 'Public',
+          type: 'Public',
+          subnets: [
+            {
+              subnetId: 'subnet-1234567890abcdef0',
+              cidr: '172.31.0.0/20',
+              availabilityZone: 'us-east-1a',
+              routeTableId: 'rtb-1234567890abcdef0',
+            },
+            {
+              subnetId: 'subnet-1234567890abcdef1',
+              cidr: '172.31.16.0/20',
+              availabilityZone: 'us-east-1b',
+              routeTableId: 'rtb-1234567890abcdef0',
+            },
+            {
+              subnetId: 'subnet-1234567890abcdef2',
+              cidr: '172.31.32.0/20',
+              availabilityZone: 'us-east-1c',
+              routeTableId: 'rtb-1234567890abcdef0',
+            },
+          ],
+        },
+      ],
+    },
 
-    createEFS: 'yes', //if yes CDK will create the EFS File System
-    useEFS: 'yes', // if true, /bitnami/magento directory will be mapped to a new empty FSX volume.
+    //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
+    'enablePrivateLink': 'true', // this parameter seems to works only one
+
+    'createEFS': 'yes', //if yes CDK will create the EFS File System
+    'useEFS': 'yes', // if true, /bitnami/magento directory will be mapped to a new empty FSX volume.
 
     //useFSX: 'yes', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
-    ec2Cluster: 'no', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
+    'ec2Cluster': 'no', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
 
     // You can customize Instances size
     // ec2InstanceType: 'c5.9xlarge',
     // rdsInstanceType: 'r6g.8xlarge',
     // cacheInstanceType: 'r6g.8xlarge',
 
-    taskCpu: 1024,
-    taskMem: 4096,
-    phpMemoryLimit: '3G',
-    magentoMinTasks: 10,
-    magentoMaxTasks: 100,
+    'taskCpu': 1024,
+    'taskMem': 4096,
+    'phpMemoryLimit': '3G',
+    'magentoMinTasks': 10,
+    'magentoMaxTasks': 100,
 
-    route53_domain_zone: 'sallaman.people.aws.dev', // You need ot provide a valide AWS Route53 Hosted Zone.
+    'route53_domain_zone': 'sallaman.people.aws.dev', // You need ot provide a valide AWS Route53 Hosted Zone.
 
-    magento_admin_task: 'yes',
-    magento_admin_task_debug: 'no',
+    'magento_admin_task': 'yes',
+    'magento_admin_task_debug': 'no',
   },
 
   gitignore: [

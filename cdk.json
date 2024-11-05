@@ -1,6 +1,55 @@
 {
   "app": "npx ts-node -P tsconfig.json --prefer-ts-exts src/integ.ts",
   "context": {
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/core:enablePartitionLiterals": true,
+    "@aws-cdk/aws-events:eventsTargetQueueSameAccount": true,
+    "@aws-cdk/aws-iam:standardizedServicePrincipals": true,
+    "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": true,
+    "@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName": true,
+    "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": true,
+    "@aws-cdk/aws-route53-patters:useFargateAlb": true,
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
+    "aws-cdk:enableDiffNoFail": true,
+    "availability-zones:account-1234567890:us-east-1": [
+      "us-east-1a",
+      "us-east-1b",
+      "us-east-1c"
+    ],
+    "hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1": {
+      "Id": "/hostedzone/MOCKZ3AMJ8IL4",
+      "Name": "magento.mydomain.com."
+    },
+    "vpc-provider:account=1234567890:filter.tag:Name=default:region=us-east-1:returnAsymmetricSubnets=true": {
+      "vpcId": "vpc-1234567890abcdef0",
+      "vpcCidrBlock": "172.31.0.0/16",
+      "subnetGroups": [
+        {
+          "name": "Public",
+          "type": "Public",
+          "subnets": [
+            {
+              "subnetId": "subnet-1234567890abcdef0",
+              "cidr": "172.31.0.0/20",
+              "availabilityZone": "us-east-1a",
+              "routeTableId": "rtb-1234567890abcdef0"
+            },
+            {
+              "subnetId": "subnet-1234567890abcdef1",
+              "cidr": "172.31.16.0/20",
+              "availabilityZone": "us-east-1b",
+              "routeTableId": "rtb-1234567890abcdef0"
+            },
+            {
+              "subnetId": "subnet-1234567890abcdef2",
+              "cidr": "172.31.32.0/20",
+              "availabilityZone": "us-east-1c",
+              "routeTableId": "rtb-1234567890abcdef0"
+            }
+          ]
+        }
+      ]
+    },
     "enablePrivateLink": "true",
     "createEFS": "yes",
     "useEFS": "yes",
