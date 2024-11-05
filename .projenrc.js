@@ -42,7 +42,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // Disable the default build workflow
   workflowBootstrapSteps: [],
-  buildWorkflow: false,
+  buildWorkflow: true,
 
   context: {
     '@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId': true,
@@ -91,24 +91,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
         },
       ],
     },
-
-    // Customize the build workflow
-    // workflowContainerImage: 'jsii/superchain:1-buster-slim-node18',
-    // github: true,
-    // buildWorkflow: {
-    //   buildSteps: [
-    //     {
-    //       name: 'Setup mock AWS environment',
-    //       run: [
-    //         'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
-    //         'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
-    //         'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-    //         'echo "CDK_DEFAULT_ACCOUNT=1234567890" >> $GITHUB_ENV',
-    //         'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-    //       ].join('\n'),
-    //     },
-    //   ],
-    // },
 
     //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
     'enablePrivateLink': 'true', // this parameter seems to works only one
@@ -167,7 +149,7 @@ workflow.addJobs({
       contents: 'read',
     },
     steps: [
-      { uses: 'actions/checkout@v3' },
+      { uses: 'actions/checkout@v4', with: { 'node-version': '20.x' }  },
       {
         name: 'Setup mock AWS environment',
         run: [
@@ -178,7 +160,8 @@ workflow.addJobs({
           'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
         ].join('\n'),
       },
-      { uses: 'actions/setup-node@v3', with: { 'node-version': '20.x' } },
+      { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
+      { name: 'Install dependencies', run: 'yarn install --check-files'},
       { run: 'npx projen build' },
     ],
   },
