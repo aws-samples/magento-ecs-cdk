@@ -36,7 +36,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     workflows: true,
   },
 
-  workflowNodeVersion: '18.x', // Specify the Node.js version for the workflow
+  workflowNodeVersion: '20.x', // Specify the Node.js version for the workflow
 
   workflowContainerImage: 'jsii/superchain:1-buster-slim-node18', // Optional: Use a specific container image
 
@@ -108,7 +108,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     //       ].join('\n'),
     //     },
     //   ],
-    // },  
+    // },
 
     //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
     'enablePrivateLink': 'true', // this parameter seems to works only one
@@ -178,10 +178,8 @@ workflow.addJobs({
           'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
         ].join('\n'),
       },
-      { uses: 'actions/setup-node@v3', with: { 'node-version': '18.x' } },
-      { run: 'npm ci' },
-      { run: 'npm run build' },
-      { run: 'npm test' },
+      { uses: 'actions/setup-node@v3', with: { 'node-version': '20.x' } },
+      { run: 'npx projen build' },
     ],
   },
 });
