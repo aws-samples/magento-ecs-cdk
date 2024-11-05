@@ -155,9 +155,140 @@ Object {
       "Type": "AWS::IAM::Role",
     },
     "Bucket83908E77": Object {
-      "DeletionPolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "BucketEncryption": Object {
+          "ServerSideEncryptionConfiguration": Array [
+            Object {
+              "ServerSideEncryptionByDefault": Object {
+                "KMSMasterKeyID": Object {
+                  "Fn::GetAtt": Array [
+                    "ECSKmsKey6C68CB5D",
+                    "Arn",
+                  ],
+                },
+                "SSEAlgorithm": "aws:kms",
+              },
+            },
+          ],
+        },
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+        "VersioningConfiguration": Object {
+          "Status": "Enabled",
+        },
+      },
       "Type": "AWS::S3::Bucket",
-      "UpdateReplacePolicy": "Retain",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "BucketAutoDeleteObjectsCustomResourceBAFD23C2": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "BucketPolicyE9A3008A",
+      ],
+      "Properties": Object {
+        "BucketName": Object {
+          "Ref": "Bucket83908E77",
+        },
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "BucketPolicyE9A3008A": Object {
+      "Properties": Object {
+        "Bucket": Object {
+          "Ref": "Bucket83908E77",
+        },
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "Bool": Object {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "Bucket83908E77",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "Bucket83908E77",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            Object {
+              "Action": Array [
+                "s3:PutBucketPolicy",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::GetAtt": Array [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "Bucket83908E77",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "Bucket83908E77",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
     },
     "Cluster3DA9CCBA": Object {
       "Properties": Object {
@@ -221,7 +352,7 @@ Object {
             Array [
               "Lambda function for auto-deleting objects in ",
               Object {
-                "Ref": "EcsExecBucket4F468651",
+                "Ref": "Bucket83908E77",
               },
               " S3 bucket.",
             ],
@@ -779,6 +910,40 @@ Object {
         "PolicyDocument": Object {
           "Statement": Array [
             Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "Bool": Object {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "EcsExecBucket4F468651",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "EcsExecBucket4F468651",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            Object {
               "Action": Array [
                 "s3:PutBucketPolicy",
                 "s3:GetBucket*",
@@ -898,16 +1063,23 @@ Object {
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
     "MagentoAuroraCluster576B8023": Object {
-      "DeletionPolicy": "Delete",
+      "DeletionPolicy": "Snapshot",
       "Properties": Object {
+        "BackupRetentionPeriod": 14,
         "CopyTagsToSnapshot": true,
-        "DBClusterParameterGroupName": "default.aurora-mysql5.7",
+        "DBClusterParameterGroupName": "default.aurora-mysql8.0",
         "DBSubnetGroupName": Object {
           "Ref": "MagentoAuroraClusterSubnets1D05994E",
         },
         "DatabaseName": "magento",
+        "DeletionProtection": true,
+        "EnableCloudwatchLogsExports": Array [
+          "error",
+          "general",
+          "slowquery",
+        ],
         "Engine": "aurora-mysql",
-        "EngineVersion": "5.7.mysql_aurora.2.12.2",
+        "EngineVersion": "8.0.mysql_aurora.3.03.0",
         "MasterUserPassword": Object {
           "Fn::Join": Array [
             "",
@@ -921,6 +1093,9 @@ Object {
           ],
         },
         "MasterUsername": "magentouser",
+        "Port": 42,
+        "PreferredBackupWindow": "03:00-04:00",
+        "StorageEncrypted": true,
         "VpcSecurityGroupIds": Array [
           Object {
             "Fn::GetAtt": Array [
@@ -931,11 +1106,43 @@ Object {
         ],
       },
       "Type": "AWS::RDS::DBCluster",
-      "UpdateReplacePolicy": "Delete",
+      "UpdateReplacePolicy": "Snapshot",
     },
-    "MagentoAuroraClusterInstance193B53C35": Object {
+    "MagentoAuroraClusterMonitoringRole76A738BF": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "monitoring.rds.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MagentoAuroraClusterReader7DD9877D": Object {
       "DeletionPolicy": "Delete",
       "DependsOn": Array [
+        "MagentoAuroraClusterWriterB45C42CA",
         "VPCPrivateSubnet1DefaultRouteAE1D6490",
         "VPCPrivateSubnet1RouteTableAssociation347902D1",
         "VPCPrivateSubnet2DefaultRouteF4F5CFD2",
@@ -946,10 +1153,18 @@ Object {
           "Ref": "MagentoAuroraCluster576B8023",
         },
         "DBInstanceClass": "db.r6g.large",
-        "DBSubnetGroupName": Object {
-          "Ref": "MagentoAuroraClusterSubnets1D05994E",
-        },
+        "EnablePerformanceInsights": true,
         "Engine": "aurora-mysql",
+        "MonitoringInterval": 60,
+        "MonitoringRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "MagentoAuroraClusterMonitoringRole76A738BF",
+            "Arn",
+          ],
+        },
+        "PerformanceInsightsRetentionPeriod": 31,
+        "PromotionTier": 2,
+        "PubliclyAccessible": false,
       },
       "Type": "AWS::RDS::DBInstance",
       "UpdateReplacePolicy": "Delete",
@@ -967,6 +1182,35 @@ Object {
         ],
       },
       "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "MagentoAuroraClusterWriterB45C42CA": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "VPCPrivateSubnet1DefaultRouteAE1D6490",
+        "VPCPrivateSubnet1RouteTableAssociation347902D1",
+        "VPCPrivateSubnet2DefaultRouteF4F5CFD2",
+        "VPCPrivateSubnet2RouteTableAssociation0C73D413",
+      ],
+      "Properties": Object {
+        "DBClusterIdentifier": Object {
+          "Ref": "MagentoAuroraCluster576B8023",
+        },
+        "DBInstanceClass": "db.r6g.large",
+        "EnablePerformanceInsights": true,
+        "Engine": "aurora-mysql",
+        "MonitoringInterval": 60,
+        "MonitoringRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "MagentoAuroraClusterMonitoringRole76A738BF",
+            "Arn",
+          ],
+        },
+        "PerformanceInsightsRetentionPeriod": 31,
+        "PromotionTier": 0,
+        "PubliclyAccessible": false,
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
     },
     "MagentoDatabasePassword6693C54A": Object {
       "DeletionPolicy": "Delete",

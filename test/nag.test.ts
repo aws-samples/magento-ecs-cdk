@@ -51,7 +51,7 @@ describe('Magento Stack with Admin, EFS, default VPC, ec2 Capacity Providers', (
     template.resourceCountIs('AWS::ECS::CapacityProvider', 1);
 
     // Creates the subscription...
-    template.resourceCountIs('AWS::RDS::DBInstance', 1);
+    template.resourceCountIs('AWS::RDS::DBInstance', 2);
     template.resourceCountIs('AWS::RDS::DBCluster', 1);
     template.resourceCountIs('AWS::OpenSearchService::Domain', 1);
     template.resourceCountIs('AWS::ECS::Service', 2);

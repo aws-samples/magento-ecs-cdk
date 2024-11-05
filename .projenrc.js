@@ -23,7 +23,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
       secret: AUTOMATION_TOKEN,
-    },  
+    },
     separateUpgrades: true,
   },
 
