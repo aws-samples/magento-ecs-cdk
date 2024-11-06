@@ -77,11 +77,11 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '@aws-cdk/aws-route53-patters:useFargateAlb': true,
     '@aws-cdk/customresources:installLatestAwsSdkDefault': false,
     'aws-cdk:enableDiffNoFail': true,
-    'availability-zones:account-1234567890:us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
-    'hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1': {
-      Id: '/hostedzone/MOCKZ3AMJ8IL4',
-      Name: 'magento.mydomain.com.',
-    },
+    //'availability-zones:account-1234567890:us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
+    // 'hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1': {
+    //   Id: '/hostedzone/MOCKZ3AMJ8IL4',
+    //   Name: 'magento.mydomain.com.',
+    // },
     'vpc-provider:account=1234567890:filter.tag:Name=default:region=us-east-1:returnAsymmetricSubnets=true': {
       vpcId: 'vpc-1234567890abcdef0',
       vpcCidrBlock: '172.31.0.0/16',
@@ -112,6 +112,11 @@ const project = new awscdk.AwsCdkTypeScriptApp({
           ],
         },
       ],
+    },
+    'availability-zones:account=1234567890:region=us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
+    'hosted-zone:account=1234567890:domainName=sallaman.people.aws.dev:region=us-east-1': {
+      Id: '/hostedzone/MOCKZ3AMJ8IL4',
+      Name: 'sallaman.people.aws.dev.'
     },
 
     //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
@@ -181,7 +186,7 @@ workflow.addJobs({
           'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
           'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
           'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-          'echo "CDK_DEFAULT_ACCOUNT=1234567890" >> $GITHUB_ENV',
+          'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
           'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
           'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
           'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',

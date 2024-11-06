@@ -9,7 +9,7 @@ const useFakeAws = process.env.CDK_FAKE_AWS === 'true';
 
 const devEnv = useFakeAws
   ? {
-    account: '123456789012', // Fake account ID
+    account: '1234567890', // Fake account ID
     region: 'us-east-1', // Fake region
   }
   : {

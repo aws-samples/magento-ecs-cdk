@@ -11,15 +11,6 @@
     "@aws-cdk/aws-route53-patters:useFargateAlb": true,
     "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
     "aws-cdk:enableDiffNoFail": true,
-    "availability-zones:account-1234567890:us-east-1": [
-      "us-east-1a",
-      "us-east-1b",
-      "us-east-1c"
-    ],
-    "hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1": {
-      "Id": "/hostedzone/MOCKZ3AMJ8IL4",
-      "Name": "magento.mydomain.com."
-    },
     "vpc-provider:account=1234567890:filter.tag:Name=default:region=us-east-1:returnAsymmetricSubnets=true": {
       "vpcId": "vpc-1234567890abcdef0",
       "vpcCidrBlock": "172.31.0.0/16",
@@ -49,6 +40,15 @@
           ]
         }
       ]
+    },
+    "availability-zones:account=1234567890:region=us-east-1": [
+      "us-east-1a",
+      "us-east-1b",
+      "us-east-1c"
+    ],
+    "hosted-zone:account=1234567890:domainName=sallaman.people.aws.dev:region=us-east-1": {
+      "Id": "/hostedzone/MOCKZ3AMJ8IL4",
+      "Name": "sallaman.people.aws.dev."
     },
     "enablePrivateLink": "true",
     "createEFS": "yes",
