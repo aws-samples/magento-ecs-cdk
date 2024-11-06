@@ -44,7 +44,10 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // Disable the default build workflow
   buildWorkflow: false,
-  buildCommand: 'npx cdk synth -c use:aws-cdk-mock',
+  
+  //buildCommand: 'npx cdk synth -c use:aws-cdk-mock',
+  
+  
   // workflowBootstrapSteps: [
   //   {
   //     name: 'Setup Mock AWS Context',
@@ -186,7 +189,7 @@ workflow.addJobs({
       },
       { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
       { name: 'Install dependencies', run: 'yarn install --check-files' },
-      { name: 'mock build', run: 'npx cdk synth -c use:aws-cdk-mock' },
+      { name: 'mock build', run: 'npx projen build' },
     ],
   },
 });

@@ -31,4 +31,4 @@ jobs:
       - name: Install dependencies
         run: yarn install --check-files
       - name: mock build
-        run: npx cdk synth -c use:aws-cdk-mock
+        run: npx projen build
