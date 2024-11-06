@@ -64,7 +64,7 @@
     "magento_admin_task_debug": "no"
   },
   "output": "cdk.out",
-  "build": "npx projen bundle",
+  "build": "npx cdk synth -c use:aws-cdk-mock",
   "watch": {
     "include": [
       "src/**/*.ts",

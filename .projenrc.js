@@ -18,10 +18,12 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   repositoryUrl: 'https://github.com/aws-samples/magento-ecs-cdk.git',
   appEntrypoint: 'integ.ts',
 
+  //https://subaud.io/blog/github-action-workflows-in-projen
   depsUpgradeOptions: {
-    ignoreProjen: true,
+    ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
+      //schedule: UpgradeDependenciesSchedule.WEEKLY,
       secret: AUTOMATION_TOKEN,
     },
     separateUpgrades: true,
@@ -41,37 +43,23 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   workflowContainerImage: 'jsii/superchain:1-buster-slim-node18', // Optional: Use a specific container image
 
   // Disable the default build workflow
-  workflowBootstrapSteps: [],
-  buildWorkflow: true,
-  workflowBootstrapSteps: [
-    {
-      name: 'Setup Mock AWS Context',
-      run: [
-        'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
-        'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-        'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
-        'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
-        'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
-        'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
-      ].join('\n'),
-    },
-  ],
-  workflowBuildSteps: [
-    {
-      name: 'CDK Synth with Mocks',
-      run: 'npx cdk synth -c use:aws-cdk-mock',
-    },
-  ],
-  //   workflowBootstrapSteps: [
+  buildWorkflow: false,
+  buildCommand: 'npx cdk synth -c use:aws-cdk-mock',
+  // workflowBootstrapSteps: [
   //   {
-  //     name: 'Custom Bootstrap Step',
-  //     run: 'echo "This is a custom bootstrap step"',
+  //     name: 'Setup Mock AWS Context',
+  //     run: [
+  //       'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
+  //       'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+  //       'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+  //       'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+  //       'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+  //       'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
+  //     ].join('\n'),
   //   },
-  // ],
-  // workflowBuildSteps: [
   //   {
-  //     name: 'Custom Build Step',
-  //     run: 'npm run custom-build-script',
+  //     name: 'build',
+  //     run: 'npx cdk synth -c use:aws-cdk-mock',
   //   },
   // ],
 
@@ -164,6 +152,9 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
 });
 
+
+
+
 // Add a custom workflow
 const workflow = project.github.addWorkflow('custom-build');
 
@@ -180,7 +171,7 @@ workflow.addJobs({
       contents: 'read',
     },
     steps: [
-      { uses: 'actions/checkout@v4', with: { 'node-version': '20.x' } },
+      { uses: 'actions/checkout@v4'},
       {
         name: 'Setup mock AWS environment',
         run: [
@@ -189,11 +180,13 @@ workflow.addJobs({
           'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
           'echo "CDK_DEFAULT_ACCOUNT=1234567890" >> $GITHUB_ENV',
           'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+          'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+          'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
         ].join('\n'),
       },
       { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
       { name: 'Install dependencies', run: 'yarn install --check-files' },
-      { run: 'npx projen build' },
+      { name: 'mock build', run: 'npx cdk synth -c use:aws-cdk-mock' },
     ],
   },
 });
