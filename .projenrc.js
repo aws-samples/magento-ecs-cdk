@@ -11,12 +11,19 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   keywords: ['aws', 'constructs', 'cdk', 'ecs', 'magento', 'fargate', 'opensearch', 'efs', 'fsx'],
   description:
     'CDK Project to deploy Magento Applications on top of AWS ECS, FARGATE/EC2, EFS/FsX Ontap, RDS, OpenSearch, ElastiCashe',
-  cdkVersion: '2.149.0',
+  cdkVersion: '2.165.0',
   defaultReleaseBranch: 'main',
   license: 'MIT',
   name: 'magento-ecs-cdk',
   repositoryUrl: 'https://github.com/aws-samples/magento-ecs-cdk.git',
   appEntrypoint: 'integ.ts',
+
+  deps: [
+    // ... other dependencies
+    //'@aws-cdk/aws-cdk-lib',
+    //'@aws-cdk/assert',  // for testing
+    //'aws-cdk-mock',     // add this for mocking
+  ],
 
   depsUpgradeOptions: {
     ignoreProjen: true,
@@ -42,7 +49,24 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // Disable the default build workflow
   workflowBootstrapSteps: [],
-  buildWorkflow: false,
+  buildWorkflow: true,
+  workflowBootstrapSteps: [
+    {
+      name: 'Setup Mock AWS Context',
+      run: [
+        'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
+        'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+        'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+        'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+      ].join('\n'),
+    },
+  ],
+  workflowBuildSteps: [
+    {
+      name: 'CDK Synth with Mocks',
+      run: 'npx cdk synth -c use:aws-cdk-mock',
+    },
+  ],
   //   workflowBootstrapSteps: [
   //   {
   //     name: 'Custom Bootstrap Step',
