@@ -44,25 +44,18 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // Disable the default build workflow
   buildWorkflow: true,
-  
-  
-  
   workflowBootstrapSteps: [
     {
       name: 'Setup Mock AWS Context',
       run: [
-        'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
-        'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-        'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
-        'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
-        'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+        // 'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
+        // 'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+        // 'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+        // 'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+        // 'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
         'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
       ].join('\n'),
     },
-    // {
-    //   name: 'build',
-    //   run: 'npx cdk synth -c use:aws-cdk-mock',
-    // },
   ],
 
   context: {
@@ -112,7 +105,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'availability-zones:account=1234567890:region=us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
     'hosted-zone:account=1234567890:domainName=sallaman.people.aws.dev:region=us-east-1': {
       Id: '/hostedzone/MOCKZ3AMJ8IL4',
-      Name: 'sallaman.people.aws.dev.'
+      Name: 'sallaman.people.aws.dev.',
     },
 
     //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
@@ -156,9 +149,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
 });
 
-
-
-
 // Add a custom workflow
 // const workflow = project.github.addWorkflow('custom-build');
 
@@ -194,6 +184,5 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 //     ],
 //   },
 // });
-
 
 project.synth();
