@@ -1,4 +1,4 @@
-import { aws_fsx as fsx, CfnOutput, RemovalPolicy, Size, Stack, StackProps, Tags } from 'aws-cdk-lib';
+import { aws_fsx as fsx, CfnOutput, RemovalPolicy, Size, Stack, StackProps, Tags, Duration } from 'aws-cdk-lib';
 import {
   AutoScalingGroup,
   BlockDevice,
@@ -8,6 +8,8 @@ import {
   Monitoring,
 } from 'aws-cdk-lib/aws-autoscaling';
 import {
+  InstanceClass,
+  InstanceSize,
   InstanceType,
   InterfaceVpcEndpointAwsService,
   Peer,
@@ -31,8 +33,15 @@ import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import * as opensearch from 'aws-cdk-lib/aws-opensearchservice';
-import { AuroraMysqlEngineVersion, Credentials, DatabaseCluster, DatabaseClusterEngine } from 'aws-cdk-lib/aws-rds';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import {
+  DatabaseCluster,
+  DatabaseClusterEngine,
+  AuroraMysqlEngineVersion,
+  Credentials,
+  PerformanceInsightRetention,
+  ClusterInstance,
+} from 'aws-cdk-lib/aws-rds';
+import { Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as cfninc from 'aws-cdk-lib/cloudformation-include';
 import * as cxapi from 'aws-cdk-lib/cx-api';
@@ -79,8 +88,21 @@ export class MagentoStack extends Stack {
       privateRouteTablesIds.push(subnet.routeTable.routeTableId);
     });
 
-    new Bucket(this, 'Bucket');
+    // Create kms key for secure logging and secret store encryption
+    // docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
+    const kmsKey = new Key(this, 'ECSKmsKey', {
+      alias: id + '-kms-ecs-' + props.clusterName,
+    });
+    new CfnOutput(stack, 'EcsKMSAlias', { value: kmsKey.keyArn });
 
+    new Bucket(this, 'Bucket', {
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      enforceSSL: true,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: kmsKey,
+      versioned: true,
+    });
     //new CfnOutput(this, 'privateroutetableid', { value: privateRouteTablesIds });
 
     const enablePrivateLink = this.node.tryGetContext('enablePrivateLink');
@@ -89,13 +111,6 @@ export class MagentoStack extends Stack {
       vpc.addInterfaceEndpoint('EFSEndpoint', { service: InterfaceVpcEndpointAwsService.ELASTIC_FILESYSTEM });
       vpc.addInterfaceEndpoint('SMEndpoint', { service: InterfaceVpcEndpointAwsService.SECRETS_MANAGER });
     }
-
-    // Create kms key for secure logging and secret store encryption
-    // docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
-    const kmsKey = new Key(this, 'ECSKmsKey', {
-      alias: id + '-kms-ecs-' + props.clusterName,
-    });
-    new CfnOutput(stack, 'EcsKMSAlias', { value: kmsKey.keyArn });
 
     // Secure ecs exec loggings
     const execLogGroup = new LogGroup(this, 'ECSExecLogGroup', {
@@ -108,6 +123,7 @@ export class MagentoStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       encryptionKey: kmsKey,
+      enforceSSL: true,
     });
     new CfnOutput(stack, 'EcsExecBucketOut', { value: execBucket.bucketName });
 
@@ -409,19 +425,35 @@ export class MagentoStack extends Stack {
 
     //const secret = SecretValue.plainText(magentoDatabasePassword.toString());
     const secret = magentoDatabasePassword.secretValue;
-    const rdsInstanceType = this.node.tryGetContext('rdsInstanceType') || 'r6g.large';
     const db = new DatabaseCluster(this, 'MagentoAuroraCluster', {
-      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_2_12_2 }),
+      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_3_03_0 }),
       credentials: Credentials.fromPassword(DB_USER, secret),
-      removalPolicy: RemovalPolicy.DESTROY,
-      instances: 1,
-      instanceProps: {
-        vpc: vpc,
-        //instanceType: InstanceType.of(InstanceClass.MEMORY6_GRAVITON, InstanceSize.XLARGE16),
-        instanceType: new InstanceType(rdsInstanceType),
-        securityGroups: [rdsSG],
-      },
+      writer: ClusterInstance.provisioned('Writer', {
+        instanceType: InstanceType.of(InstanceClass.R6G, InstanceSize.LARGE),
+        enablePerformanceInsights: true,
+        performanceInsightRetention: PerformanceInsightRetention.MONTHS_1,
+      }),
+      readers: [
+        ClusterInstance.provisioned('Reader', {
+          instanceType: InstanceType.of(InstanceClass.R6G, InstanceSize.LARGE),
+          enablePerformanceInsights: true,
+          performanceInsightRetention: PerformanceInsightRetention.MONTHS_1,
+        }),
+      ],
+      vpc,
+      vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [rdsSG],
       defaultDatabaseName: DB_NAME,
+      removalPolicy: RemovalPolicy.SNAPSHOT,
+      storageEncrypted: true,
+      deletionProtection: true,
+      backup: {
+        retention: Duration.days(14),
+        preferredWindow: '03:00-04:00',
+      },
+      cloudwatchLogsExports: ['error', 'general', 'slowquery'],
+      monitoringInterval: Duration.seconds(60),
+      port: 42,
     });
 
     const elastiCacheSecurityGroup = new SecurityGroup(this, 'ElasticacheSecurityGroup', {

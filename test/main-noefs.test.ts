@@ -37,7 +37,7 @@ describe('Magento Stack with No Admin, No EFS', () => {
     });
 
     // Creates the subscription...
-    template.resourceCountIs('AWS::RDS::DBInstance', 1);
+    template.resourceCountIs('AWS::RDS::DBInstance', 2);
     template.resourceCountIs('AWS::RDS::DBCluster', 1);
     template.resourceCountIs('AWS::OpenSearchService::Domain', 1);
     template.resourceCountIs('AWS::ECS::Service', 1);
