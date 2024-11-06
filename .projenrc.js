@@ -43,28 +43,27 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   workflowContainerImage: 'jsii/superchain:1-buster-slim-node18', // Optional: Use a specific container image
 
   // Disable the default build workflow
-  buildWorkflow: false,
-  
-  //buildCommand: 'npx cdk synth -c use:aws-cdk-mock',
+  buildWorkflow: true,
   
   
-  // workflowBootstrapSteps: [
-  //   {
-  //     name: 'Setup Mock AWS Context',
-  //     run: [
-  //       'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
-  //       'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-  //       'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
-  //       'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
-  //       'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
-  //       'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
-  //     ].join('\n'),
-  //   },
-  //   {
-  //     name: 'build',
-  //     run: 'npx cdk synth -c use:aws-cdk-mock',
-  //   },
-  // ],
+  
+  workflowBootstrapSteps: [
+    {
+      name: 'Setup Mock AWS Context',
+      run: [
+        'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
+        'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+        'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+        'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+        'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+        'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
+      ].join('\n'),
+    },
+    // {
+    //   name: 'build',
+    //   run: 'npx cdk synth -c use:aws-cdk-mock',
+    // },
+  ],
 
   context: {
     '@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId': true,
@@ -77,11 +76,8 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '@aws-cdk/aws-route53-patters:useFargateAlb': true,
     '@aws-cdk/customresources:installLatestAwsSdkDefault': false,
     'aws-cdk:enableDiffNoFail': true,
-    //'availability-zones:account-1234567890:us-east-1': ['us-east-1a', 'us-east-1b', 'us-east-1c'],
-    // 'hosted-zone:account=1234567890:domainName=magento.mydomain.com:region=us-east-1': {
-    //   Id: '/hostedzone/MOCKZ3AMJ8IL4',
-    //   Name: 'magento.mydomain.com.',
-    // },
+
+    //Mock
     'vpc-provider:account=1234567890:filter.tag:Name=default:region=us-east-1:returnAsymmetricSubnets=true': {
       vpcId: 'vpc-1234567890abcdef0',
       vpcCidrBlock: '172.31.0.0/16',
@@ -164,40 +160,40 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
 
 // Add a custom workflow
-const workflow = project.github.addWorkflow('custom-build');
+// const workflow = project.github.addWorkflow('custom-build');
 
-workflow.on({
-  push: { branches: ['main'] },
-  pullRequest: { branches: ['main'] },
-  workflowDispatch: {},
-});
+// workflow.on({
+//   push: { branches: ['main'] },
+//   pullRequest: { branches: ['main'] },
+//   workflowDispatch: {},
+// });
 
-workflow.addJobs({
-  build: {
-    runsOn: ['ubuntu-latest'],
-    permissions: {
-      contents: 'read',
-    },
-    steps: [
-      { uses: 'actions/checkout@v4'},
-      {
-        name: 'Setup mock AWS environment',
-        run: [
-          'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
-          'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
-          'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-          'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
-          'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
-          'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
-          'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
-        ].join('\n'),
-      },
-      { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
-      { name: 'Install dependencies', run: 'yarn install --check-files' },
-      { name: 'mock build', run: 'npx projen build' },
-    ],
-  },
-});
+// workflow.addJobs({
+//   build: {
+//     runsOn: ['ubuntu-latest'],
+//     permissions: {
+//       contents: 'read',
+//     },
+//     steps: [
+//       { uses: 'actions/checkout@v4'},
+//       {
+//         name: 'Setup mock AWS environment',
+//         run: [
+//           'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
+//           'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+//           'echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+//           'echo "CDK_DEFAULT_ACCOUNT=123456789012" >> $GITHUB_ENV',
+//           'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
+//           'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+//           'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
+//         ].join('\n'),
+//       },
+//       { uses: 'actions/setup-node@v4', with: { 'node-version': '20.x' } },
+//       { name: 'Install dependencies', run: 'yarn install --check-files' },
+//       { name: 'mock build', run: 'npx projen build' },
+//     ],
+//   },
+// });
 
 
 project.synth();
