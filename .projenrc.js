@@ -18,13 +18,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   repositoryUrl: 'https://github.com/aws-samples/magento-ecs-cdk.git',
   appEntrypoint: 'integ.ts',
 
-  deps: [
-    // ... other dependencies
-    //'@aws-cdk/aws-cdk-lib',
-    //'@aws-cdk/assert',  // for testing
-    //'aws-cdk-mock',     // add this for mocking
-  ],
-
   depsUpgradeOptions: {
     ignoreProjen: true,
     workflowOptions: {
@@ -58,6 +51,8 @@ const project = new awscdk.AwsCdkTypeScriptApp({
         'echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV',
         'echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV',
         'echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV',
+        'echo "AWS_REGION=us-east-1" >> $GITHUB_ENV',
+        'echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV',
       ].join('\n'),
     },
   ],

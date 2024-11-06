@@ -25,6 +25,8 @@ jobs:
           echo "CDK_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
           echo "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" >> $GITHUB_ENV
+          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
+          echo "CDK_FAKE_AWS=true" >> $GITHUB_ENV
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
