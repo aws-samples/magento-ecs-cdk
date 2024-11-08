@@ -51,9 +51,10 @@
       "Name": "sallaman.people.aws.dev."
     },
     "enablePrivateLink": "true",
-    "createEFS": "yes",
-    "useEFS": "yes",
-    "ec2Cluster": "no",
+    "createEFS": "no",
+    "useEFS": "no",
+    "useFSX": "yes",
+    "ec2Cluster": "yes",
     "taskCpu": 1024,
     "taskMem": 4096,
     "phpMemoryLimit": "3G",

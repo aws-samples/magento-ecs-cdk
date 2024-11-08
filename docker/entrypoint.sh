@@ -33,8 +33,27 @@ if [[ "$1" = "/opt/bitnami/scripts/magento/run.sh" || "$1" = "/opt/bitnami/scrip
     /opt/bitnami/scripts/php/setup.sh
     info "** Starting Magento setup mysql**"
     /opt/bitnami/scripts/mysql-client/setup.sh
-    info "** Starting Magento magento **"
 
+
+    info "** Fix Grant **"
+    if [[ "$MAGENTO_ADMIN_TASK" = "yes" ]]; then
+      # Wait for database to be ready (if necessary)
+      until mysql -h $MAGENTO_DATABASE_HOST -u $MAGENTO_DATABASE_USER -p$MAGENTO_DATABASE_PASSWORD -e "SELECT 1"; do
+        echo "Waiting for database connection..."
+        sleep 5
+      done
+
+      # Now apply your GRANT privileges
+      mysql -h $MAGENTO_DATABASE_HOST -u $MAGENTO_DATABASE_USER -p$MAGENTO_DATABASE_PASSWORD $MAGENTO_DATABASE_NAME <<EOF
+      GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, 
+      CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, 
+      CREATE ROUTINE, ALTER ROUTINE, TRIGGER ON $MAGENTO_DATABASE_NAME.* 
+      TO '$MAGENTO_DATABASE_USER'@'%';
+      FLUSH PRIVILEGES;
+EOF
+    fi
+    
+    info "** Starting Magento magento **"
     #Accelerate the boot for additional tasks by disabling setup:upgrade
      if [[ "$MAGENTO_ADMIN_TASK" = "no" ]]; then
        sed -i 's/        info "Upgrading database schema"/        info "DISABLE Upgrading database schema"/' /opt/bitnami/scripts/libmagento.sh

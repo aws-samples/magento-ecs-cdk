@@ -42,3 +42,9 @@ upgrade:
 local-test:
 	 docker run -ti -v $(PWD):/src -w /src allamand/eksutils zsh    
 	
+local-magento:
+	cd docker && docker build -t magento .
+	docker rm magento
+	docker run -d --name magento --env MAGENTO_ADMIN_TASK=yes magento /opt/bitnami/scripts/magento/run.sh
+	sleep 2
+	docker logs magento -f

@@ -80,7 +80,7 @@ Configuration files are :
 If you get an error in magento, you can find corresponding log in
 
 ```
-/bitnami/magento/var/report/<error_id>
+/bitnami/magento/var/log/<error_id>
 ```
 
 If the error is like
@@ -114,6 +114,27 @@ You can connect to the Mysql DB from magento asks:
 mysql -h $MAGENTO_DATABASE_HOST -u $MAGENTO_DATABASE_USER -p$MAGENTO_DATABASE_PASSWORD $MAGENTO_DATABASE_NAME
 ```
 
+Some commands:
+
+```
+Select User, Host from mysql.user;
+
+SHOW GRANTS FOR 'magentouser'@'%';
+
+```
+
+```
+
+GRANT ALL PRIVILEGES ON . TO 'magentouser'@'%';
+
+mysql -h $MAGENTO_DATABASE_HOST -u $MAGENTO_DATABASE_USER -p$MAGENTO_DATABASE_PASSWORD $MAGENTO_DATABASE_NAME
+
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, 
+CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, 
+CREATE ROUTINE, ALTER ROUTINE, TRIGGER ON magentodemo.* 
+TO 'magentouser'@'%';
+```
+
 ## Elasticsearch
 
 You can test the OpenSearch connection with curl:
@@ -132,16 +153,40 @@ curl -XPOST -u "$MAGENTO_ELASTICSEARCH_USER:$MAGENTO_ELASTICSEARCH_PASSWORD" "ht
 The stack is configured to delete the database cluster and OpenSearch cluster, and EFS file system. If you want to be able to keep the data, you will need to update the **removalPolicy** policies of those services in the CDK code.
 
 ```typescript
-    const db = new DatabaseCluster(this, 'ServerlessWordpressAuroraCluster', {
-      engine: DatabaseClusterEngine.AURORA_MYSQL,
+  ...
+
+    #Prevent db deletion
+    const db = new DatabaseCluster(this, 'MagentoAuroraCluster', {
+      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_3_07_1 }),
       credentials: Credentials.fromPassword(DB_USER, secret),
-      removalPolicy: RemovalPolicy.DESTROY, // <-- you can change this ----------------------------->
-      instanceProps: {
-        vpc: vpc,
-        securityGroups: [rdsSG],
-      },
+      writer: ClusterInstance.provisioned('Writer', {
+        instanceType: InstanceType.of(InstanceClass.R6G, InstanceSize.LARGE),
+        enablePerformanceInsights: true,
+        performanceInsightRetention: PerformanceInsightRetention.MONTHS_1,
+      }),
+      readers: [
+        ClusterInstance.provisioned('Reader', {
+          instanceType: InstanceType.of(InstanceClass.R6G, InstanceSize.LARGE),
+          enablePerformanceInsights: true,
+          performanceInsightRetention: PerformanceInsightRetention.MONTHS_1,
+        }),
+      ],
+      vpc,
+      vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [rdsSG],
       defaultDatabaseName: DB_NAME,
+      removalPolicy: RemovalPolicy.DESTROY, // <-- you can change this ----------------------------->
+      backtrackWindow: Duration.hours(24), // Enable Backtrack with a 24-hour window
+      backup: {
+        retention: Duration.days(14),
+        preferredWindow: '03:00-04:00',
+      },
+      cloudwatchLogsExports: ['error', 'general', 'slowquery'],
+      monitoringInterval: Duration.seconds(60),
+      storageEncrypted: true, // Ensure storage encryption for security
+      deletionProtection: false, // <-- you can change this ---------------------------->
     });
+
     ...
 
     const osDomain = new opensearch.Domain(this, 'Domain', {
@@ -161,6 +206,8 @@ The stack is configured to delete the database cluster and OpenSearch cluster, a
       encrypted: true,
       removalPolicy: RemovalPolicy.DESTROY,// <-- you can change this ---------------------------->
     });
+
+
 ```
 
 While we can't delete an ECS Capacity Provider when associated Autoscaling Group still exists, the first attempt to delete the stack may be finished in a `DELETE_FAILED` state. A second delete attempt should properly delete everything.

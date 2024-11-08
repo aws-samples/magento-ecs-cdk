@@ -6,8 +6,10 @@ import {
   EbsDeviceVolumeType,
   GroupMetrics,
   Monitoring,
+  ScalingEvents,
 } from 'aws-cdk-lib/aws-autoscaling';
 import {
+  GatewayVpcEndpointAwsService,
   InstanceClass,
   InstanceSize,
   InstanceType,
@@ -45,8 +47,14 @@ import { Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as cfninc from 'aws-cdk-lib/cloudformation-include';
 import * as cxapi from 'aws-cdk-lib/cx-api';
+//import * as cr from 'aws-cdk-lib/custom-resources';
+//import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import { MagentoService } from './magento';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import * as cr from 'aws-cdk-lib/custom-resources';
+import * as iam from 'aws-cdk-lib/aws-iam';
+
 
 //https://www.npmjs.com/package/@aws-cdk-containers/ecs-service-extensions?activeTab=readme
 export interface MagentoStackProps extends StackProps {
@@ -80,9 +88,9 @@ export class MagentoStack extends Stack {
       }
     } else {
       vpc = new Vpc(this, 'VPC', { maxAzs: 2 });
+      vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
     }
-    const privateSubnetIds = vpc.selectSubnets({ subnetType: SubnetType.PRIVATE_WITH_NAT }).subnetIds;
-
+    const privateSubnetIds = vpc.selectSubnets({ subnetType: SubnetType.PRIVATE_WITH_EGRESS }).subnetIds;
     let privateRouteTablesIds: string[] = [];
     vpc.privateSubnets.forEach((subnet) => {
       privateRouteTablesIds.push(subnet.routeTable.routeTableId);
@@ -107,9 +115,14 @@ export class MagentoStack extends Stack {
 
     const enablePrivateLink = this.node.tryGetContext('enablePrivateLink');
     if (enablePrivateLink == 'true') {
-      vpc.addInterfaceEndpoint('CWEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH });
+      vpc.addInterfaceEndpoint('CWIEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH_APPLICATION_INSIGHTS });
+      vpc.addInterfaceEndpoint('CWLEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS});
       vpc.addInterfaceEndpoint('EFSEndpoint', { service: InterfaceVpcEndpointAwsService.ELASTIC_FILESYSTEM });
       vpc.addInterfaceEndpoint('SMEndpoint', { service: InterfaceVpcEndpointAwsService.SECRETS_MANAGER });
+      vpc.addGatewayEndpoint('S3GatewayEndpoint', {service: GatewayVpcEndpointAwsService.S3 });
+      vpc.addInterfaceEndpoint('SSMEndpoint', {service: InterfaceVpcEndpointAwsService.SSM });
+      vpc.addInterfaceEndpoint('EC2MessagesEndpoint', {service: InterfaceVpcEndpointAwsService.EC2_MESSAGES });
+      vpc.addInterfaceEndpoint('SSMMessagesEndpoint', {service: InterfaceVpcEndpointAwsService.SSM_MESSAGES});
     }
 
     // Secure ecs exec loggings
@@ -177,8 +190,10 @@ export class MagentoStack extends Stack {
     if (contextEc2Cluster == 'yes' || contextEc2Cluster == 'true') {
       ec2Cluster = true;
     }
+    
     let asg1: AutoScalingGroup;
     let cp1: AsgCapacityProvider;
+
     if (ec2Cluster) {
       //https://github.com/PasseiDireto/gh-runner-ecs-ec2-stack/blob/cc6c13824bec5081e2d39a7adf7e9a2d0c8210a1/cluster.ts
 
@@ -268,8 +283,8 @@ export class MagentoStack extends Stack {
 
       //gp3 block device for instances
       const blockDeviceVolume = BlockDeviceVolume.ebs(30, {
-        deleteOnTermination: true,
-        encrypted: false,
+        deleteOnTermination: true, // TODO, change this for real production usage
+        encrypted: true,
         volumeType: EbsDeviceVolumeType.GP3,
       });
 
@@ -277,6 +292,11 @@ export class MagentoStack extends Stack {
         deviceName: '/dev/xvda',
         volume: blockDeviceVolume,
       };
+
+      // Create an SNS topic for ASG notifications
+      const asgNotificationTopic = new Topic(this, 'ASGNotificationTopic', {
+        topicName: 'asg-notifications',
+      });
 
       const ec2InstanceType = this.node.tryGetContext('ec2InstanceType') || 'c5.xlarge';
       asg1 = new AutoScalingGroup(this, 'Asg1', {
@@ -293,7 +313,23 @@ export class MagentoStack extends Stack {
         // https://github.com/aws/aws-cdk/issues/11581
         role: asgRole,
         blockDevices: [blockDevice],
+
+        // Add notifications for all scaling events
+        notifications: [
+          {
+            topic: asgNotificationTopic,
+            scalingEvents: ScalingEvents.ALL,
+          },
+        ],
       }); //asg1.addToRolePolicy()
+      
+      // Set the removal policy for the ASG
+      asg1.applyRemovalPolicy(RemovalPolicy.DESTROY);
+      // Make the ASG depend on the VPC
+      asg1.node.addDependency(vpc);
+
+      // Grant permissions to the ASG to publish to the SNS topic
+      asgNotificationTopic.grantPublish(asg1.role);
 
       var dnsName = `${svmId.ref}.${cfnFileSystem.ref}.fsx.${this.region}.amazonaws.com`;
 
@@ -322,6 +358,8 @@ export class MagentoStack extends Stack {
         enableManagedTerminationProtection: true,
         targetCapacityPercent: 100, //do some over-provisionning
       });
+      // Make the capacity provider depend on the ASG
+      cp1.node.addDependency(asg1);
     }
 
     // Create or Reuse ECS Cluster
@@ -358,9 +396,41 @@ export class MagentoStack extends Stack {
       if (ec2Cluster) {
         //const cluster = cluster as Cluster;
         cluster.addAsgCapacityProvider(cp1!);
+        // Make the cluster depend on the capacity provider
+        cluster.node.addDependency(cp1!);
       }
     }
     new CfnOutput(this, 'ClusterName', { value: cluster.clusterName });
+
+    
+    vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    cluster.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    asg1!.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+    
+    // Create the custom resource for cleanup
+    const cleanupResource = new cr.AwsCustomResource(this, 'RemoveCapacityProvider', {
+      onDelete: {
+        service: 'ECS',
+        action: 'putClusterCapacityProviders',
+        parameters: {
+          cluster: cluster.clusterName,
+          capacityProviders: [],
+          defaultCapacityProviderStrategy: []
+        },
+        physicalResourceId: cr.PhysicalResourceId.of('RemoveCapacityProviderResource'),
+      },
+      policy: cr.AwsCustomResourcePolicy.fromStatements([
+        new iam.PolicyStatement({
+          actions: ['ecs:PutClusterCapacityProviders'],
+          resources: [`arn:aws:ecs:${this.region}:${this.account}:cluster/${cluster.clusterName}`],
+        }),
+      ]),
+    });
+
+    // Ensure the cleanup resource runs before the cluster is deleted
+    cluster.node.addDependency(cleanupResource);
+
 
     /*
      ** Configure Flows security group in VPC
@@ -425,8 +495,10 @@ export class MagentoStack extends Stack {
 
     //const secret = SecretValue.plainText(magentoDatabasePassword.toString());
     const secret = magentoDatabasePassword.secretValue;
+
+    // @ts-ignore: CWE-668
     const db = new DatabaseCluster(this, 'MagentoAuroraCluster', {
-      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_3_03_0 }),
+      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_3_07_1 }),
       credentials: Credentials.fromPassword(DB_USER, secret),
       writer: ClusterInstance.provisioned('Writer', {
         instanceType: InstanceType.of(InstanceClass.R6G, InstanceSize.LARGE),
@@ -444,17 +516,47 @@ export class MagentoStack extends Stack {
       vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_EGRESS },
       securityGroups: [rdsSG],
       defaultDatabaseName: DB_NAME,
-      removalPolicy: RemovalPolicy.SNAPSHOT,
-      storageEncrypted: true,
-      deletionProtection: true,
+      //removalPolicy: RemovalPolicy.SNAPSHOT,
+      removalPolicy: RemovalPolicy.DESTROY, // <-- you can change this ----------------------------->
+      backtrackWindow: Duration.hours(24), // Enable Backtrack with a 24-hour window
       backup: {
         retention: Duration.days(14),
         preferredWindow: '03:00-04:00',
       },
       cloudwatchLogsExports: ['error', 'general', 'slowquery'],
       monitoringInterval: Duration.seconds(60),
-      port: 42,
+      storageEncrypted: true, // Ensure storage encryption for security
+      deletionProtection: false, // Enable this for Production clusters
     });
+
+    // // Create a custom resource to grant specific privileges
+    // // Create a custom resource to grant specific privileges
+    // const grantPrivileges = new cr.AwsCustomResource(this, 'GrantDatabasePrivileges', {
+    //   onCreate: {
+    //     service: 'RDSDataService',
+    //     action: 'executeStatement',
+    //     parameters: {
+    //       resourceArn: db.clusterArn,
+    //       secretArn: db.secret?.secretArn,
+    //       database: DB_NAME,
+    //       sql: `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, 
+    //             CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, 
+    //             CREATE ROUTINE, ALTER ROUTINE, TRIGGER ON ${DB_NAME}.* 
+    //             TO '${DB_USER}'@'%';
+    //             FLUSH PRIVILEGES;`,
+    //     },
+    //     physicalResourceId: cr.PhysicalResourceId.of('GrantPrivileges'),
+    //   },
+    //   policy: cr.AwsCustomResourcePolicy.fromStatements([
+    //     new iam.PolicyStatement({
+    //       actions: ['rds-data:ExecuteStatement'],
+    //       resources: [db.clusterArn, db.secret?.secretArn || '*'],
+    //     }),
+    //   ]),
+    // });
+
+    // // Ensure this custom resource runs after the database is created
+    // grantPrivileges.node.addDependency(db);
 
     const elastiCacheSecurityGroup = new SecurityGroup(this, 'ElasticacheSecurityGroup', {
       vpc: vpc,

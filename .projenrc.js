@@ -11,7 +11,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   keywords: ['aws', 'constructs', 'cdk', 'ecs', 'magento', 'fargate', 'opensearch', 'efs', 'fsx'],
   description:
     'CDK Project to deploy Magento Applications on top of AWS ECS, FARGATE/EC2, EFS/FsX Ontap, RDS, OpenSearch, ElastiCashe',
-  cdkVersion: '2.165.0',
+  cdkVersion: '2.166.0',
   defaultReleaseBranch: 'main',
   license: 'MIT',
   name: 'magento-ecs-cdk',
@@ -111,11 +111,11 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     //vpc_tag_name: 'ecsworkshop-base/BaseVPC', // TAG Name of the VPC to create the cluster into (or 'default' or comment to create new one)
     'enablePrivateLink': 'true', // this parameter seems to works only one
 
-    'createEFS': 'yes', //if yes CDK will create the EFS File System
-    'useEFS': 'yes', // if true, /bitnami/magento directory will be mapped to a new empty FSX volume.
+    'createEFS': 'no', //if yes CDK will create the EFS File System
+    'useEFS': 'no', // if true, /bitnami/magento directory will be mapped to a new empty FSX volume.
 
-    //useFSX: 'yes', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
-    'ec2Cluster': 'no', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
+    'useFSX': 'yes', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
+    'ec2Cluster': 'yes', // if yes, create en EC2 based cluster (required for FsX), if no create Fargate cluster
 
     // You can customize Instances size
     // ec2InstanceType: 'c5.9xlarge',
