@@ -152,6 +152,12 @@ Object {
     },
   },
   "Resources": Object {
+    "ASGNotificationTopic655E24DD": Object {
+      "Properties": Object {
+        "TopicName": "asg-notifications",
+      },
+      "Type": "AWS::SNS::Topic",
+    },
     "AWS679f53fac002430cb0da5b7982bd22872D164C4C": Object {
       "DependsOn": Array [
         "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
@@ -205,6 +211,7 @@ Object {
       "Type": "AWS::IAM::Role",
     },
     "Asg1ASG8A2F9427": Object {
+      "DeletionPolicy": "Delete",
       "Properties": Object {
         "LaunchConfigurationName": Object {
           "Ref": "Asg1LaunchConfig13CB129F",
@@ -217,6 +224,19 @@ Object {
         ],
         "MinSize": "1",
         "NewInstancesProtectedFromScaleIn": true,
+        "NotificationConfigurations": Array [
+          Object {
+            "NotificationTypes": Array [
+              "autoscaling:EC2_INSTANCE_LAUNCH",
+              "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+              "autoscaling:EC2_INSTANCE_TERMINATE",
+              "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+            ],
+            "TopicARN": Object {
+              "Ref": "ASGNotificationTopic655E24DD",
+            },
+          },
+        ],
         "Tags": Array [
           Object {
             "Key": "Name",
@@ -235,6 +255,7 @@ Object {
           "IgnoreUnmodifiedGroupSizeProperties": true,
         },
       },
+      "UpdateReplacePolicy": "Delete",
     },
     "Asg1InstanceProfileF0687320": Object {
       "Properties": Object {
@@ -257,7 +278,7 @@ Object {
             "DeviceName": "/dev/xvda",
             "Ebs": Object {
               "DeleteOnTermination": true,
-              "Encrypted": false,
+              "Encrypted": true,
               "VolumeSize": 30,
               "VolumeType": "gp3",
             },
@@ -347,6 +368,13 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
+            Object {
+              "Action": "sns:Publish",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Ref": "ASGNotificationTopic655E24DD",
+              },
+            },
             Object {
               "Action": Array [
                 "ecs:DeregisterContainerInstance",
@@ -572,6 +600,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
       "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
     },
     "ClusterEB0386A7": Object {
+      "DeletionPolicy": "Delete",
       "Properties": Object {
         "ClusterName": "magento",
         "ClusterSettings": Array [
@@ -604,6 +633,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         },
       },
       "Type": "AWS::ECS::Cluster",
+      "UpdateReplacePolicy": "Delete",
     },
     "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": Object {
       "DependsOn": Array [
@@ -1427,8 +1457,9 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
       "Type": "AWS::EFS::MountTarget",
     },
     "MagentoAuroraCluster576B8023": Object {
-      "DeletionPolicy": "Snapshot",
+      "DeletionPolicy": "Delete",
       "Properties": Object {
+        "BacktrackWindow": 86400,
         "BackupRetentionPeriod": 14,
         "CopyTagsToSnapshot": true,
         "DBClusterParameterGroupName": "default.aurora-mysql8.0",
@@ -1436,14 +1467,14 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           "Ref": "MagentoAuroraClusterSubnets1D05994E",
         },
         "DatabaseName": "magento",
-        "DeletionProtection": true,
+        "DeletionProtection": false,
         "EnableCloudwatchLogsExports": Array [
           "error",
           "general",
           "slowquery",
         ],
         "Engine": "aurora-mysql",
-        "EngineVersion": "8.0.mysql_aurora.3.03.0",
+        "EngineVersion": "8.0.mysql_aurora.3.07.1",
         "MasterUserPassword": Object {
           "Fn::Join": Array [
             "",
@@ -1457,7 +1488,6 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
           ],
         },
         "MasterUsername": "magentouser",
-        "Port": 42,
         "PreferredBackupWindow": "03:00-04:00",
         "StorageEncrypted": true,
         "VpcSecurityGroupIds": Array [
@@ -1470,7 +1500,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         ],
       },
       "Type": "AWS::RDS::DBCluster",
-      "UpdateReplacePolicy": "Snapshot",
+      "UpdateReplacePolicy": "Delete",
     },
     "MagentoAuroraClusterMonitoringRole76A738BF": Object {
       "Properties": Object {
@@ -1768,7 +1798,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
             "Essential": true,
             "Image": Object {
-              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:ca4728ab8c88c1b3696d6f5b72909a7d9a92c850e2608d0233de1d0d9c0d0a83",
+              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:c7d604857081028bb0c4e58774ea6a1952184e369e2e14c2dfc057904a89c349",
             },
             "LogConfiguration": Object {
               "LogDriver": "awslogs",
@@ -2682,7 +2712,7 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
             ],
             "Essential": true,
             "Image": Object {
-              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:ca4728ab8c88c1b3696d6f5b72909a7d9a92c850e2608d0233de1d0d9c0d0a83",
+              "Fn::Sub": "1234567890.dkr.ecr.us-east-1.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-1234567890-us-east-1:c7d604857081028bb0c4e58774ea6a1952184e369e2e14c2dfc057904a89c349",
             },
             "LogConfiguration": Object {
               "LogDriver": "awslogs",
@@ -3173,6 +3203,66 @@ echo ECS_AWSVPC_BLOCK_IMDS=true >> /etc/ecs/ecs.config",
         ],
       },
       "Type": "AWS::ElastiCache::SubnetGroup",
+    },
+    "RemoveCapacityProviderABB34814": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "RemoveCapacityProviderCustomResourcePolicy6A2F1083",
+      ],
+      "Properties": Object {
+        "Delete": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"service\\":\\"ECS\\",\\"action\\":\\"putClusterCapacityProviders\\",\\"parameters\\":{\\"cluster\\":\\"",
+              Object {
+                "Ref": "ClusterEB0386A7",
+              },
+              "\\",\\"capacityProviders\\":[],\\"defaultCapacityProviderStrategy\\":[]},\\"physicalResourceId\\":{\\"id\\":\\"RemoveCapacityProviderResource\\"}}",
+            ],
+          ],
+        },
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::AWS",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "RemoveCapacityProviderCustomResourcePolicy6A2F1083": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "ecs:PutClusterCapacityProviders",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:aws:ecs:us-east-1:1234567890:cluster/",
+                    Object {
+                      "Ref": "ClusterEB0386A7",
+                    },
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "RemoveCapacityProviderCustomResourcePolicy6A2F1083",
+        "Roles": Array [
+          Object {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "TemplatedatavolEAF39683": Object {
       "Properties": Object {

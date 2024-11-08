@@ -32,6 +32,7 @@ import {
 import { AccessPoint, FileSystem, LifecyclePolicy, PerformanceMode, ThroughputMode } from 'aws-cdk-lib/aws-efs';
 import { CfnCacheCluster, CfnSubnetGroup } from 'aws-cdk-lib/aws-elasticache';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import * as opensearch from 'aws-cdk-lib/aws-opensearchservice';
@@ -45,15 +46,14 @@ import {
 } from 'aws-cdk-lib/aws-rds';
 import { Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import { Topic } from 'aws-cdk-lib/aws-sns';
 import * as cfninc from 'aws-cdk-lib/cloudformation-include';
+import * as cr from 'aws-cdk-lib/custom-resources';
 import * as cxapi from 'aws-cdk-lib/cx-api';
 //import * as cr from 'aws-cdk-lib/custom-resources';
 //import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import { MagentoService } from './magento';
-import { Topic } from 'aws-cdk-lib/aws-sns';
-import * as cr from 'aws-cdk-lib/custom-resources';
-import * as iam from 'aws-cdk-lib/aws-iam';
 
 
 //https://www.npmjs.com/package/@aws-cdk-containers/ecs-service-extensions?activeTab=readme
@@ -116,13 +116,13 @@ export class MagentoStack extends Stack {
     const enablePrivateLink = this.node.tryGetContext('enablePrivateLink');
     if (enablePrivateLink == 'true') {
       vpc.addInterfaceEndpoint('CWIEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH_APPLICATION_INSIGHTS });
-      vpc.addInterfaceEndpoint('CWLEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS});
+      vpc.addInterfaceEndpoint('CWLEndpoint', { service: InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS });
       vpc.addInterfaceEndpoint('EFSEndpoint', { service: InterfaceVpcEndpointAwsService.ELASTIC_FILESYSTEM });
       vpc.addInterfaceEndpoint('SMEndpoint', { service: InterfaceVpcEndpointAwsService.SECRETS_MANAGER });
-      vpc.addGatewayEndpoint('S3GatewayEndpoint', {service: GatewayVpcEndpointAwsService.S3 });
-      vpc.addInterfaceEndpoint('SSMEndpoint', {service: InterfaceVpcEndpointAwsService.SSM });
-      vpc.addInterfaceEndpoint('EC2MessagesEndpoint', {service: InterfaceVpcEndpointAwsService.EC2_MESSAGES });
-      vpc.addInterfaceEndpoint('SSMMessagesEndpoint', {service: InterfaceVpcEndpointAwsService.SSM_MESSAGES});
+      vpc.addGatewayEndpoint('S3GatewayEndpoint', { service: GatewayVpcEndpointAwsService.S3 });
+      vpc.addInterfaceEndpoint('SSMEndpoint', { service: InterfaceVpcEndpointAwsService.SSM });
+      vpc.addInterfaceEndpoint('EC2MessagesEndpoint', { service: InterfaceVpcEndpointAwsService.EC2_MESSAGES });
+      vpc.addInterfaceEndpoint('SSMMessagesEndpoint', { service: InterfaceVpcEndpointAwsService.SSM_MESSAGES });
     }
 
     // Secure ecs exec loggings
@@ -190,7 +190,7 @@ export class MagentoStack extends Stack {
     if (contextEc2Cluster == 'yes' || contextEc2Cluster == 'true') {
       ec2Cluster = true;
     }
-    
+
     let asg1: AutoScalingGroup;
     let cp1: AsgCapacityProvider;
 
@@ -322,7 +322,7 @@ export class MagentoStack extends Stack {
           },
         ],
       }); //asg1.addToRolePolicy()
-      
+
       // Set the removal policy for the ASG
       asg1.applyRemovalPolicy(RemovalPolicy.DESTROY);
       // Make the ASG depend on the VPC
@@ -358,8 +358,6 @@ export class MagentoStack extends Stack {
         enableManagedTerminationProtection: true,
         targetCapacityPercent: 100, //do some over-provisionning
       });
-      // Make the capacity provider depend on the ASG
-      cp1.node.addDependency(asg1);
     }
 
     // Create or Reuse ECS Cluster
@@ -392,31 +390,28 @@ export class MagentoStack extends Stack {
           logging: ExecuteCommandLogging.OVERRIDE,
         },
       });
+      cluster.applyRemovalPolicy(RemovalPolicy.DESTROY);
       //Cast cluster to Cluster instead of ICluster
       if (ec2Cluster) {
         //const cluster = cluster as Cluster;
         cluster.addAsgCapacityProvider(cp1!);
         // Make the cluster depend on the capacity provider
-        cluster.node.addDependency(cp1!);
+        //cluster.node.addDependency(cp1!);
       }
     }
     new CfnOutput(this, 'ClusterName', { value: cluster.clusterName });
 
-    
-    vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
-    cluster.applyRemovalPolicy(RemovalPolicy.DESTROY);
-    asg1!.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
-    
     // Create the custom resource for cleanup
-    const cleanupResource = new cr.AwsCustomResource(this, 'RemoveCapacityProvider', {
+    //const cleanupResource =
+    new cr.AwsCustomResource(this, 'RemoveCapacityProvider', {
       onDelete: {
         service: 'ECS',
         action: 'putClusterCapacityProviders',
         parameters: {
           cluster: cluster.clusterName,
           capacityProviders: [],
-          defaultCapacityProviderStrategy: []
+          defaultCapacityProviderStrategy: [],
         },
         physicalResourceId: cr.PhysicalResourceId.of('RemoveCapacityProviderResource'),
       },
@@ -429,7 +424,7 @@ export class MagentoStack extends Stack {
     });
 
     // Ensure the cleanup resource runs before the cluster is deleted
-    cluster.node.addDependency(cleanupResource);
+    //cluster.node.addDependency(cleanupResource);
 
 
     /*
@@ -539,9 +534,9 @@ export class MagentoStack extends Stack {
     //       resourceArn: db.clusterArn,
     //       secretArn: db.secret?.secretArn,
     //       database: DB_NAME,
-    //       sql: `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, 
-    //             CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, 
-    //             CREATE ROUTINE, ALTER ROUTINE, TRIGGER ON ${DB_NAME}.* 
+    //       sql: `GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER,
+    //             CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW,
+    //             CREATE ROUTINE, ALTER ROUTINE, TRIGGER ON ${DB_NAME}.*
     //             TO '${DB_USER}'@'%';
     //             FLUSH PRIVILEGES;`,
     //     },
